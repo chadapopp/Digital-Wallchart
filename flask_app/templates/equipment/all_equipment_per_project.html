@@ -1,0 +1,38 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">All Equipment for <br> {{ project.project_name }}</h2>
+    <div class="row justify-content-center"> <!-- Center the row horizontally -->
+        <div class=""> <!-- Set the maximum width of the table -->
+            <div class="table-responsive">
+                <table class="table table-striped" id="equipment_table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th>Number</th>
+                            <th>Scope</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for equipment in equipment_data %}
+                        <tr>
+                            <td>{{equipment.type}}</td>
+                            <td>{{ equipment.name }}</td>
+                            <td>{{ equipment.number }}</td>
+                            <td><textarea class="form-control" style="border:none; background-color: {{ loop.cycle('#f0f0f0', '#ffffff' ) }};" readonly>{{ equipment.scope }}</textarea></td>
+                            <td>
+                                <a href="/edit_equipment/{{project.id}}/{{equipment.id}}" class="btn btn-primary">Edit</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <a href="/add_single_equipment/{{ project.id }}" class="btn btn-primary">Add Equipment</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

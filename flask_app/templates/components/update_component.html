@@ -1,0 +1,20 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <form action="/update_component/{{component_id}}" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="file" class="form-label">Choose Excel File:</label>
+                    <input type="file" id="file" name="file" accept=".xlsx, .xls" class="form-control">
+                </div>
+                <input type="hidden" name="user_id" value="{{ user_id }}">
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

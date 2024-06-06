@@ -1,0 +1,50 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div class="p-4 mt-5 container">
+    <h2 class="text-center">Edit Tasks for {{ component.name }}</h2>
+    <form action="{{ url_for('edit_methods', project_id=project_id, component_id=component.id) }}" method="POST">
+        <div class="form-group">
+            <label for="methods">Select Methods:</label>
+            <select class="form-control" name="methods" multiple>
+                {% for method in available_methods %}
+                    <option value="{{ method }}" {% if method in current_methods %}selected{% endif %}>{{ method }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Methods</button>
+    </form>
+
+    <h3 class="mt-5">Current Methods</h3>
+    <form action="{{ url_for('update_methods', project_id=project_id, component_id=component.id) }}" method="POST">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for method in current_methods %}
+                    <tr>
+                        <td>{{ method.method_type }}</td>
+                        <td>
+                            <select class="form-control" name="status_{{ method.id }}">
+                                <option value="Pending" {% if method.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                <option value="In Progress" {% if method.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                <option value="Completed" {% if method.status == 'Completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                        </td>
+                        <td>
+                            <form action="{{ url_for('delete_method', project_id=project_id, component_id=component.id, method_id=method.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+</div>
+{% endblock %}

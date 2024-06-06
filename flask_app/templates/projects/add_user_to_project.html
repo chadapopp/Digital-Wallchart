@@ -1,0 +1,22 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Add User to Project</h2>
+    <form method="post" action="/add_user_to_project/{{project_id}}">
+        <input type="hidden" name="project_id" value="{{ project_id }}">
+        <div class="mb-3">
+            <label for="user_id" class="form-label">Select User</label>
+            <select class="form-select" id="user_id" name="user_id">
+                <option>Select User</option>
+                {% for user in users %}
+                <option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Assign User to Project</button>
+    </form>
+</div>
+{% endblock %}
+
+

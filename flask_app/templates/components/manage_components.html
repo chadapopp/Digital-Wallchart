@@ -1,0 +1,52 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div class="p-4 mt-5 container">
+    <h2 class="text-center">Manage Components</h2>
+    
+    <!-- List Current Components -->
+    <h3>Current Components</h3>
+    <ul id="current-components" class="list-group mb-4">
+        {% for component in components %}
+            <li class="list-group-item" data-id="{{ component.id }}">{{ component.name }}</li>
+        {% endfor %}
+    </ul>
+    
+    <!-- Form to Add New Components -->
+    <h3>Add New Components</h3>
+    <form id="add-component-form" action="{{ url_for('manage_components', project_id=project_id, equipment_id=equipment_id) }}" method="POST">
+        <div class="form-group">
+            <label for="name">Component Names (comma-separated):</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="e.g., Component1, Component2, Component3">
+        </div>
+        <button type="submit" class="btn btn-primary">Add Components</button>
+    </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+<script>
+    var el = document.getElementById('current-components');
+    var sortable = Sortable.create(el, {
+        animation: 150,
+        onEnd: function (evt) {
+            var order = sortable.toArray();
+            console.log('Current order:', order);
+            // Optionally, send this order to the server if you need to persist it
+        }
+    });
+
+    document.getElementById('add-component-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        var componentNames = document.getElementById('name').value.split(',').map(name => name.trim()).filter(name => name);
+        
+        componentNames.forEach(name => {
+            var li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.textContent = name;
+            el.appendChild(li);
+        });
+        
+        this.submit();
+    });
+</script>
+{% endblock %}

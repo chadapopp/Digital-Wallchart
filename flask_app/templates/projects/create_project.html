@@ -1,0 +1,23 @@
+{% extends 'index.html' %} 
+
+{% block content %}
+<!-- Main content -->
+<div class="container">
+    <div class="centered-form">
+        <div class="bg-white p-8 shadow-md rounded-lg max-w-md w-full">
+            <!-- login form -->
+            <form method="post" action="/create_project">
+                <div class="mb-3">
+                    <label for="project_name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="project_name" aria-describedby="emailHelp" name="project_name">
+                </div>
+                <div class="mb-3">
+                    <label for="project_company" class="form-label">Company</label>
+                    <input type="text" class="form-control" id="project_company" name="project_company">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

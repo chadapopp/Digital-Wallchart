@@ -1,0 +1,33 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div class="container col-6">
+
+    <form action="{{ url_for('add_single_equipment', project_id=project_id) }}" method="POST">
+        <div class="form-group">
+            <label for="name">Equipment Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="type">Equipment Type</label>
+            <select class="form-control" id="type" name="type" required>
+                <option value="Exchanger">Exchanger</option>
+                <option value="Fin Fan">Fin Fan</option>
+                <option value="Heater">Heater</option>
+                <option value="Drum">Drum</option>
+                <option value="Tower">Tower</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="number">Equipment Number</label>
+            <input type="text" class="form-control" id="number" name="number" required>
+        </div>
+        <div class="form-group">
+            <label for="scope">Scope</label>
+            <textarea class="form-control" id="scope" name="scope" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Equipment</button>
+    </form>
+</div>
+
+{% endblock %}

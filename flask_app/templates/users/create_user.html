@@ -1,0 +1,39 @@
+{% extends 'index.html' %} 
+
+{% block content %}
+<!-- Main content -->
+<div class="container">
+    <div class="centered-form">
+        <div class="bg-white p-8 shadow-md rounded-lg max-w-md w-full">
+            <!-- login form -->
+            <form method="post" action="/create_user">
+                <div class="mb-3">
+                    <label for="first_name" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="first_name" aria-describedby="emailHelp" name="first_name">
+                </div>
+                <div class="mb-3">
+                    <label for="last_name" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="last_name" name="last_name">
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="email" aria-describedby="emailHelp" name="email">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="role">Permissions</label>
+                    <select class="form-select" id="role" name="role">
+                        <option value="read_write">Read/Write</option>
+                        <option value="read_only">Read Only</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

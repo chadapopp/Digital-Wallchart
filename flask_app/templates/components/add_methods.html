@@ -1,0 +1,37 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div class="p-4 mt-5 container">
+    <h2 class="text-center">Add Methods to Components for {{ equipment.number }} - {{ equipment.name }}</h2>
+    <form action="{{ url_for('add_methods', project_id=project_id, equipment_id=equipment.id) }}" method="POST">
+        <div class="table-responsive mt-4">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Component Name</th>
+                        <th>Existing Methods</th>
+                        <th>Add New Methods (comma separated)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for component in components %}
+                        <tr>
+                            <td>{{ component.name }}</td>
+                            <td>
+                                {% set component_methods = components_methods.get(component.id, []) %}
+                                {% for method in component_methods %}
+                                    <span class="badge badge-secondary text-black d-block">{{ method }}</span>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <input type="text" name="method_type_{{ component.id }}" class="form-control mt-2" placeholder="Add new methods, separated by commas">
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Save Methods</button>
+    </form>
+</div>
+{% endblock %}

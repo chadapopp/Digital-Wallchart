@@ -1,0 +1,130 @@
+{% block content %}
+<div id="loadingScreen" class="loading-screen" style="display:none;">
+    <div class="spinner"></div>
+</div>
+<div class="table-responsive">
+    <table class="table table-striped" id="equipment_table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Number</th>
+                {% for component_name in all_component_names %}
+                    <th>{{ component_name }}</th>
+                {% endfor %}
+                <th>View</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for equipment in equipment_data %}
+            <tr>
+                <td>{{ equipment.name }}</td>
+                <td>{{ equipment.number }}</td>
+                {% for component_name in all_component_names %}
+                    <td>
+                        {% if component_name in components_by_equipment[equipment.id] %}
+                            {% set component = components_by_equipment[equipment.id][component_name] %}
+                            <div id="component-{{ component.id }}" class="component-methods">
+                                {% for method in component.methods %}
+                                    <span class="badge 
+                                        {% if method.status == 'Complete' %}
+                                            badge-success
+                                        {% elif method.status == 'Repair Required' %}
+                                            badge-danger
+                                        {% elif method.status == 'In Progress' %}
+                                            badge-warning
+                                        {% else %}
+                                            badge-secondary
+                                        {% endif %}
+                                        text-black d-flex">
+                                        <a href="#" class="text-black d-flex" data-bs-toggle="modal" data-bs-target="#methodModal" data-method-id="{{ method.id }}" data-component-id="{{ component.id }}" data-method-status="{{ method.status }}" data-equipment-id="{{ equipment.id }}">
+                                            {{ method.method_type }} {{method.status}}
+                                        </a>
+                                    </span>
+                                    {% if method.status == 'Repair Required' %}
+                                        <div class="repair-details">
+                                            <p>Repair Number: {{ method.repair_number }}</p>
+                                            <a href="{{ method.file_path }}" target="_blank">View Document</a>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                {% endfor %}
+                <td>
+                    <a href="/edit_equipment/{{ project.id }}/{{ equipment.id }}" class="btn btn-primary">Edit</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<a href="/add_single_equipment/{{ project.id }}" class="btn btn-primary">Add Equipment</a>
+<a href="/export_data/{{ project.id }}" class="btn btn-secondary">Export Data to Excel</a>
+
+<!-- Method Modal -->
+<div class="modal fade" id="methodModal" tabindex="-1" aria-labelledby="methodModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="methodModalLabel">Update Method Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="methodStatusForm" method="POST" action="{{ url_for('update_component_method_status') }}" enctype="multipart/form-data">
+                    <input type="hidden" id="componentId" name="component_id">
+                    <input type="hidden" id="methodId" name="method_id">
+                    <input type="hidden" id="equipmentId" name="equipment_id">
+                    <input type="hidden" id="currentTab" name="currentTab" value="{{ current_tab }}">
+                
+                    <div class="mb-3">
+                        <label for="methodStatus" class="form-label">Status</label>
+                        <select class="form-select" id="methodStatus" name="status">
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Complete">Complete</option>
+                            <option value="Repair Required">Repair Required</option>
+                        </select>
+                    </div>
+                
+                    <div id="currentRepairFields" style="display: none;">
+                        <div class="mb-3">
+                            <label for="currentRepairNumber" class="form-label">Current Repair Number</label>
+                            <input type="text" class="form-control" id="currentRepairNumber" name="current_repair_number" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="currentDescription" class="form-label">Current Repair Description</label>
+                            <textarea class="form-control" id="currentDescription" name="current_description" rows="3" readonly></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="currentFile" class="form-label">Current Repair Document</label>
+                            <a id="currentFileLink" href="#" target="_blank">View Document</a>
+                        </div>
+                    </div>
+                
+                    <div id="repairFields" style="display: none;">
+                        <div class="mb-3">
+                            <label for="newRepairNumber" class="form-label">New Repair Number</label>
+                            <input type="text" class="form-control" id="newRepairNumber" name="new_repair_number">
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">New Repair Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Upload New Repair Document</label>
+                            <input class="form-control" type="file" id="file" name="file">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Status</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+

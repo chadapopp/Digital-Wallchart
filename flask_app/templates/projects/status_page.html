@@ -1,0 +1,171 @@
+{% extends 'index.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1>Project Status</h1>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <div class="chart-container">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center mt-4">
+        <div class="col-6">
+            <div id="loadingScreen" class="loading-screen" style="display: none;">
+                <div class="spinner"></div>
+            </div>
+            <div class="table-responsive" id="componentsTableContainer" style="display:none;">
+                <table class="table table-striped" id="componentsTable">
+                    <thead>
+                        <tr>
+                            <th>Equipment Number</th>
+                            <th>Component</th>
+                            <th>Status</th>
+                            <th>Description</th>
+                            <th>Attachments</th>
+                        </tr>
+                    </thead>
+                    <tbody id="componentsTableBody">
+                        <!-- Component rows will be added here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function showLoadingScreen() {
+        document.getElementById('loadingScreen').style.display = 'flex';
+    }
+
+    function hideLoadingScreen() {
+        document.getElementById('loadingScreen').style.display = 'none';
+    }
+
+    async function fetchStatusData() {
+        showLoadingScreen();
+        try {
+            const response = await fetch(`/project/status/{{ project_id }}`);
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log('Data fetched:', data);
+            return data;
+        } catch (error) {
+            console.error('Error fetching status data:', error);
+        } finally {
+            hideLoadingScreen();
+        }
+    }
+
+    async function fetchComponents() {
+        try {
+            const response = await fetch(`/project/status/{{ project_id }}`);
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log('Components fetched:', data);
+            return data.repairs;
+        } catch (error) {
+            console.error('Error fetching components:', error);
+        }
+    }
+
+    function filterComponentsByRepair(components) {
+        const tbody = document.getElementById('componentsTableBody');
+        tbody.innerHTML = '';
+        components.forEach(component => {
+            const row = document.createElement('tr');
+            const numberCell = document.createElement('td');
+            numberCell.textContent = component.equipment;
+            const nameCell = document.createElement('td');
+            nameCell.textContent = component.component;
+            const statusCell = document.createElement('td');
+            statusCell.textContent = component.status;
+            const descriptionCell = document.createElement('td');
+            descriptionCell.textContent = component.description;
+            const documentCell = document.createElement('td');
+            if (component.document) {
+                const documentLink = document.createElement('a');
+                documentLink.href = '/' + component.document;  // Use the relative path
+                documentLink.target = '_blank';
+                documentLink.textContent = 'View Document';
+                documentCell.appendChild(documentLink);
+            } else {
+                documentCell.textContent = 'No document';
+            }
+
+            row.appendChild(numberCell);
+            row.appendChild(nameCell);
+            row.appendChild(statusCell);
+            row.appendChild(descriptionCell);
+            row.appendChild(documentCell);
+            tbody.appendChild(row);
+        });
+        document.getElementById('componentsTableContainer').style.display = 'block';
+    }
+
+    function renderChart(data) {
+        console.log('Rendering chart with data:', data);
+        const ctx = document.getElementById('statusChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed', 'Repair Required', 'Pending'],
+                datasets: [{
+                    label: 'Project Status',
+                    data: [data.completed, data.repair, data.pending],
+                    backgroundColor: ['#28a745', '#dc3545', '#ffc107'],
+                    borderColor: ['#28a745', '#dc3545', '#ffc107'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Project Status'
+                    }
+                },
+                onClick: async function(evt, item) {
+                    if (item.length > 0 && item[0].index === 1) {
+                        // Show loading screen
+                        showLoadingScreen();
+                        try {
+                            const components = await fetchComponents();
+                            filterComponentsByRepair(components);
+                        } catch (error) {
+                            console.error('Error filtering components:', error);
+                        } finally {
+                            hideLoadingScreen();
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        console.log('DOM fully loaded and parsed');
+        const statusData = await fetchStatusData();
+        if (statusData) {
+            renderChart(statusData);
+        }
+    });
+</script>
+{% endblock %}

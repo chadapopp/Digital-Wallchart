@@ -1,0 +1,18 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Upload Repair Details</h1>
+    <form action="{{ url_for('repairs/upload_repair', component_id=component_id, equipment_id=equipment_id) }}" method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="description" class="form-label">Repair Description</label>
+            <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="file" class="form-label">Upload Repair Document</label>
+            <input class="form-control" type="file" id="file" name="file" accept=".doc,.docx" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}

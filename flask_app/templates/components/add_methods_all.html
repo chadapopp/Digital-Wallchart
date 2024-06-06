@@ -1,0 +1,53 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div class="p-4 mt-5 container">
+    <h2 class="text-center">Add Methods to Components</h2>
+    <form action="{{ url_for('add_methods_all', project_id=project_id) }}" method="POST">
+        {% for equipment_type in ["Exchanger", "Fin Fan", "Heater", "Drum", "Tower"] %}
+            <div class="mt-5">
+                <h3>{{ equipment_type }}</h3>
+                <div class="table-responsive mt-4">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Equipment Number</th>
+                                {% set unique_components = [] %}
+                                {% for equipment in equipment_list if equipment.type == equipment_type %}
+                                    {% for component in components_by_equipment[equipment.number] %}
+                                        {% if component.name not in unique_components %}
+                                            {% set unique_components = unique_components + [component.name] %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for component_name in unique_components %}
+                                    <th>{{ component_name }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for equipment in equipment_list if equipment.type == equipment_type %}
+                                <tr>
+                                    <td>{{ equipment.number }}</td>
+                                    {% for component_name in unique_components %}
+                                        <td>
+                                            {% for component in components_by_equipment[equipment.number] if component.name == component_name %}
+                                                {% set component_methods = components_methods.get(component.id, []) %}
+                                                {% for method in component_methods %}
+                                                    <span class="badge badge-secondary text-black d-block">{{ method }}</span>
+                                                {% endfor %}
+                                                <input type="text" name="new_method_{{ component.id }}" class="form-control mt-2" placeholder="Add new method">
+                                            {% endfor %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary mt-3">Save Methods</button>
+    </form>
+</div>
+{% endblock %}

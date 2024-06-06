@@ -1,0 +1,158 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div class="p-4 mt-5">
+    <div>
+        <a href="/project/status_page/{{project.id}}">View Status</a>
+    </div>
+    <div class="tabs text-black">
+        <ul class="nav nav-tabs" id="equipmentTabs">
+            {% for equipment_type in equipment_types %}
+                <li class="nav-item">
+                    <a class="nav-link equipment-type-tab text-black {% if equipment_type.type == 'Exchanger' %}active{% endif %}" href="#" data-equipment-type="{{ equipment_type.type }}">{{ equipment_type.type }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div id="equipmentTabContent">
+        {% include 'wallchart/equipment_table.html' %}
+    </div>
+</div>
+
+<!-- Hidden input to store current tab -->
+<input type="hidden" id="currentTab" name="currentTab" value="{{ current_tab }}">
+{% endblock %}
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        var isLoading = false;
+    
+        function showLoadingScreen() {
+            if (!isLoading) {
+                $('#loadingScreen').show();
+                isLoading = true;
+            }
+        }
+    
+        function hideLoadingScreen() {
+            if (isLoading) {
+                $('#loadingScreen').hide();
+                isLoading = false;
+            }
+        }
+    
+        function loadEquipmentData(equipmentType) {
+            showLoadingScreen();
+            $.ajax({
+                url: '/view_wallchart/{{ project.id }}?equipment_type=' + equipmentType,
+                type: 'GET',
+                success: function(response) {
+                    $('#equipmentTabContent').html(response);
+                    hideLoadingScreen();
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                    hideLoadingScreen();
+                }
+            });
+        }
+    
+        var currentTab = $('#currentTab').val();
+        loadEquipmentData(currentTab);
+    
+        $(document).on('click', '.equipment-type-tab', function(e) {
+            e.preventDefault();
+            var equipmentType = $(this).data('equipment-type');
+            $('#currentTab').val(equipmentType);
+            loadEquipmentData(equipmentType);
+    
+            $('.equipment-type-tab').removeClass('active');
+            $(this).addClass('active');
+        });
+    
+        $(document).on('show.bs.modal', '#methodModal', function(event) {
+            var button = $(event.relatedTarget);
+            var methodId = button.data('method-id');
+            var componentId = button.data('component-id');
+            var methodStatus = button.data('method-status');
+            var equipmentId = button.data('equipment-id');
+    
+            var modal = $(this);
+            modal.find('#methodId').val(methodId);
+            modal.find('#componentId').val(componentId);
+            modal.find('#equipmentId').val(equipmentId);
+            modal.find('#methodStatus').val(methodStatus);
+    
+            if (methodStatus === 'Repair Required') {
+                $('#repairFields').show();
+    
+                $.ajax({
+                    url: '/get_repair_details',
+                    type: 'GET',
+                    data: {
+                        component_id: componentId,
+                        equipment_id: equipmentId
+                    },
+                    success: function(response) {
+                        if (response.description) {
+                            $('#currentRepairFields').show();
+                            $('#currentRepairNumber').val(response.repair_number);
+                            $('#currentDescription').val(response.description);
+                            if (response.file_path) {
+                                $('#currentFileLink').attr('href', '/uploads/' + response.file_path).show();
+                            } else {
+                                $('#currentFileLink').hide();
+                            }
+                        } else {
+                            $('#currentRepairFields').hide();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+    
+            } else {
+                $('#repairFields').hide();
+                $('#currentRepairFields').hide();
+            }
+        });
+    
+        $(document).on('submit', '#methodStatusForm', function(event) {
+            event.preventDefault();
+            showLoadingScreen();
+            $('#methodModal').modal('hide');
+    
+            var formData = new FormData(this);
+            var currentTab = $('#currentTab').val();
+            formData.append('currentTab', currentTab);
+    
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    loadEquipmentData(response.currentTab);
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                    hideLoadingScreen();
+                }
+            });
+        });
+    
+        $(document).on('change', '#methodStatus', function() {
+            if ($(this).val() === 'Repair Required') {
+                $('#repairFields').show();
+            } else {
+                $('#repairFields').hide();
+            }
+        });
+    });
+    
+
+</script>
+{% endblock %}
