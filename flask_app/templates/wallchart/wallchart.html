@@ -59,6 +59,12 @@
         }
     
         var currentTab = $('#currentTab').val();
+        console.log('Initial currentTab value:', currentTab); // Logging
+        if (currentTab === "") {
+            currentTab = "Exchanger";
+            $('#currentTab').val(currentTab);
+        }
+        console.log('CurrentTab after check:', currentTab); // Logging
         loadEquipmentData(currentTab);
     
         $(document).on('click', '.equipment-type-tab', function(e) {
@@ -128,6 +134,7 @@
             var currentTab = $('#currentTab').val();
             formData.append('currentTab', currentTab);
     
+        
             $.ajax({
                 type: 'POST',
                 url: $(this).attr('action'),
@@ -135,10 +142,17 @@
                 contentType: false,
                 processData: false,
                 success: function(response) {
-                    loadEquipmentData(response.currentTab);
+                    console.log('Method status updated, reloading tab:', response.currentTab); // Logging
+                    var newTab = response.currentTab || currentTab; // Default to currentTab if empty
+                    $('#currentTab').val(newTab);
+                    loadEquipmentData(newTab);
+                    // Remove 'active' class from all tabs and add to the clicked tab
+                    $('.equipment-type-tab').removeClass('active');
+                    $('a[data-equipment-type="' + newTab + '"]').addClass('active');
+                    hideLoadingScreen();
                 },
-                error: function(error) {
-                    console.log('Error:', error);
+                error: function(xhr, status, error) {
+                    console.log('Error updating method status:', error);
                     hideLoadingScreen();
                 }
             });
