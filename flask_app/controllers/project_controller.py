@@ -1,4 +1,4 @@
-from flask import session, request, render_template, redirect, flash, jsonify, send_file
+from flask import session, request, render_template, redirect, flash, jsonify, send_file, url_for
 from flask_app import app
 from flask_app.models.project import Projects
 from flask_app.models.user import User
@@ -9,6 +9,8 @@ from flask_app.models.component_method import Component_Methods
 from flask_app.models.user_projects import User_Projects
 import pandas as pd
 from io import BytesIO
+import os
+
 
 @app.route('/create_project', methods=["GET", "POST"])
 def create_project():
@@ -30,7 +32,10 @@ def create_project():
 @app.route('/show_all_projects', methods = ["GET"])
 def show_all_projects():
     projects = Projects.get_all()
-    return render_template("/projects/all_projects.html", projects = projects)
+    user_id = session.get('user_id')
+    user_role = User.get_user_by_id(user_id)
+    print("User role: ", user_role.role)
+    return render_template("/projects/all_projects.html", projects = projects, user_role = user_role)
 
 @app.route('/add_user_to_project/<int:project_id>', methods=["GET", "POST"])
 def add_user_to_project(project_id):
@@ -92,60 +97,53 @@ def status_page(project_id):
 
 @app.route('/project/status/<int:project_id>')
 def project_status(project_id):
-    
+    # Example function to get project status data
     equipment_data = Equipment.get_equipment_by_project(project_id)
-    
+
     total_methods = 0
     completed_methods = 0
     repair_methods = 0
     repairs_info = []
-    
+
     for equipment in equipment_data:
         components = Components.get_components_by_equipment_id(equipment.id)
         for component in components:
             component_methods = Component_Methods.get_methods_by_component_id(component.id)
             total_methods += len(component_methods)
             for method in component_methods:
-                if method['status'] == 'Completed':
+                if method['status'] == 'Complete':
                     completed_methods += 1
                 elif method['status'] == 'Repair Required':
                     repair_methods += 1
                     repair_info = Repairs.get_by_component_and_equipment(component.id, equipment.id)
                     if repair_info:
-                        for repair in repair_info:
-                            repairs_info.append({
-                                'component': component.name,
-                                'equipment': equipment.number,
-                                'description': repair.get('description', 'No description available'),
-                                'document': repair.get('file_path', ''),
-                                'status': method['status']
-                            })
-                    else:
+                        repair_info = repair_info[0] if isinstance(repair_info, list) and len(repair_info) > 0 else repair_info
+                        method['repair_number'] = repair_info.get('repair_number', 'N/A')
+                        method['file_path'] = repair_info.get('file_path', '')
                         repairs_info.append({
                             'component': component.name,
                             'equipment': equipment.number,
-                            'description': 'No description available',
-                            'document': '',
-                            'status': method['status']
+                            'status': method['status'],
+                            'description': repair_info.get('description', 'No description available'),
+                            'document': url_for('uploaded_file', filename=os.path.basename(method['file_path'])),
+                            'repair_number': repair_info.get('repair_number', 'N/A')
                         })
-    
+
     if total_methods > 0:
         completed_percentage = (completed_methods / total_methods) * 100
         repair_percentage = (repair_methods / total_methods) * 100
         pending_percentage = 100 - completed_percentage - repair_percentage
     else:
         completed_percentage = repair_percentage = pending_percentage = 0
-    
+
     return jsonify({
-        'completed': completed_percentage,
+        'complete': completed_percentage,
         'repair': repair_percentage,
         'pending': pending_percentage,
         'repairs': repairs_info
     })
 
-
-
-
+    
 @app.route('/export_data/<int:project_id>')
 def export_data(project_id):
     # Fetch equipment data for the specified project
