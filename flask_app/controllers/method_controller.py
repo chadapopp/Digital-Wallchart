@@ -6,8 +6,10 @@ from flask_app.models.equipment import Equipment
 from flask_app.models.component import Components
 from flask_app.models.method import Methods
 from flask_app.models.component_method import Component_Methods
+from flask_app.models.repairs import Repairs
 import os
 import pandas as pd
+from datetime import datetime
 
 @app.route('/edit_methods_all/<int:project_id>', methods=['GET', 'POST'])
 def edit_methods_all(project_id):
@@ -94,9 +96,11 @@ def update_component_method_status():
     repair_number = request.form.get('new_repair_number')
     file = request.files.get('file')
     current_tab = request.form.get('currentTab')
+    updated_by = request.form.get('updated_by')
+    updated_at = request.form.get('updated_at')
 
-    # Log received data for debugging
-    print(f"Received data - Component ID: {component_id}, Method ID: {method_id}, Status: {status}, Description: {description}, Current Tab: {current_tab}, Repair Number: {repair_number}")
+    # Convert updated_at to datetime object
+    updated_at = datetime.strptime(updated_at, '%Y-%m-%d') if updated_at else datetime.now()
 
     # Save the file if provided
     file_path = None
@@ -104,6 +108,7 @@ def update_component_method_status():
         filename = secure_filename(file.filename)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
+        file_path = filename
 
     # Get the equipment_id based on the component_id if needed
     component = Components.get_component_by_id(component_id)
@@ -117,9 +122,18 @@ def update_component_method_status():
         'description': description,
         'repair_number': repair_number,
         'file_path': file_path,
-        'equipment_id': equipment_id  # Ensure this is included
+        'updated_by': updated_by,
+        'updated_at': updated_at,
+        'equipment_id': equipment_id
     }
+
     Component_Methods.update_method_status(repair_data)
+
+    # Check if all repairs for this method are complete, rejected, or deferred
+    if status in ['Complete', 'Rejected', 'Deferred']:
+        incomplete_repairs = Repairs.get_incomplete_repairs_by_method(method_id)
+        if not incomplete_repairs:
+            Component_Methods.update_method_status_to_complete(component_id, method_id)
 
     return jsonify({'currentTab': current_tab})
 
