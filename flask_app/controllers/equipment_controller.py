@@ -5,6 +5,7 @@ from flask_app.models.project import Projects
 from flask_app.models.equipment import Equipment
 from flask_app.models.component import Components
 from flask_app.models.method import Methods
+from flask_app.models.user import User
 from flask_app.models.component_method import Component_Methods
 import pandas as pd
 import os
@@ -104,8 +105,9 @@ def view_equipment_by_project(project_id):
     equipment_data = Equipment.get_equipment_by_project(project_id)
     project = Projects.get_project_by_id(project_id)
     user = session.get('user_id') 
-    return render_template('equipment/all_equipment_per_project.html', equipment_data=equipment_data, project=project, user=user)
-
+    user_role = User.get_user_by_id(user)
+    
+    return render_template('equipment/all_equipment_per_project.html', equipment_data=equipment_data, project=project, user_role = user_role)
 
 @app.route('/view_equipment_by_type/<int:project_id>', methods=['GET'])
 def view_equipment_by_type(project_id):
@@ -119,11 +121,16 @@ def edit_equipment(project_id, equipment_id):
     equipment = Equipment.get_equipment_by_id(equipment_id)
     project = Projects.get_project_by_id(project_id)
     components = Components.get_components_by_equipment_id(equipment_id)
-    methods = ["VT", "UTT", "PT", "MT", "RT", "PAUT", "ECT", "RFT", "IRIS", "Ok to Close", "Ok to Install Bundle", "Complete"]# Get components for the specific equipment ID
+    user = session.get('user_id')
+    user_role = User.get_user_by_id(user)
 
+    # Fetch and associate methods with each component
+    for component in components:
+        component.methods = Component_Methods.get_methods_by_component_id(component.id)
+    
     if request.method == "POST":
         data = {
-            "id": equipment_id,  # Include equipment_id in the data dictionary
+            "id": equipment_id,
             "name": request.form["name"],
             "number": request.form['number'],
             "scope": request.form["scope"],
@@ -133,8 +140,15 @@ def edit_equipment(project_id, equipment_id):
         Equipment.edit_equipment(data)  
         return redirect(f"/view_equipment_per_project/{project_id}")
     
-    return render_template('equipment/edit_equipment.html', equipment=equipment, project=project, components=components)
+    return render_template('equipment/edit_equipment.html', equipment=equipment, project=project, components=components, user_role = user_role)
 
+
+
+@app.route('/delete_equipment/<int:project_id>/<int:equipment_id>', methods=['GET', 'POST'])
+def remove_equipment(project_id, equipment_id):
+    Equipment.delete_equipment(equipment_id)
+    return redirect(f"/view_equipment_per_project/{project_id}")
+    
 
 
 
