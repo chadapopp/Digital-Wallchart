@@ -116,3 +116,13 @@ class Components:
         else:
             return False
     
+    @classmethod
+    def edit_component(cls, data):
+        query = "UPDATE components SET name=%(name)s WHERE id=%(id)s"
+        return connectToMySQL(cls.DB).query_db(query, data)
+
+    @classmethod
+    def delete_component(cls, component_id):
+        query = "DELETE FROM components WHERE id = %(component_id)s"
+        data = {'component_id': component_id}
+        return connectToMySQL(cls.DB).query_db(query, data)
