@@ -223,3 +223,21 @@ form {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+.table th, .table td {
+    width: 100px; /* Set a fixed width for columns */
+    word-wrap: break-word; /* Ensure text wraps within the cell */
+}
+
+.scope {
+    max-width: 200px; /* Set a maximum width for the scope div */
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden; /* Hide overflow text */
+    text-overflow: ellipsis; /* Add ellipsis for overflow text */
+}
+
+.scope:hover {
+    white-space: normal; /* Allow text to wrap on hover */
+    overflow: auto; /* Add scroll bar on hover */
+}
+
