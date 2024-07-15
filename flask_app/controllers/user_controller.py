@@ -63,3 +63,4 @@ def assign_project():
     User.assign_project(user_id, project_id)
     flash("Project assigned successfully", "success")
     return redirect('/projects')
+
