@@ -38,7 +38,7 @@ class Equipment:
     @classmethod
     def get_equipment_by_project(cls, project_id):
         query = "SELECT * FROM equipment WHERE project_id = %s"
-        data = (project_id,)
+        data = (project_id)
         results = connectToMySQL(cls.DB).query_db(query, data)
         equipment_list = [Equipment(equipment_data) for equipment_data in results]  # Convert dictionary objects to Equipment instances
         return equipment_list
@@ -84,8 +84,9 @@ class Equipment:
     @classmethod
     def delete_equipment(cls, data):
         query = "DELETE FROM equipment WHERE id=%(id)s"
-        connectToMySQL(cls.DB).query_db(query, data)
-        return True
+        data = {"id": data}
+        results = connectToMySQL(cls.DB).query_db(query, data)
+        return results
     
     @classmethod
     def get_exchangers_by_project(cls, project_id):
