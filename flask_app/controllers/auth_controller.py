@@ -27,14 +27,21 @@ def login():
 # Display user's homepage
 @app.route('/homepage', methods=["GET"])
 def user_homepage():
-    # Redirect to login if user is not logged in
     if 'user_id' not in session:
         return redirect('/')
+
+    user = User.get_user_by_id(session['user_id'])
     
-    # Retrieve user's first_name from session
-    user_first_name = session.get('first_name', 'Guest')
+    # Ensure user exists before proceeding
+    if not user:
+        return redirect('/')
     
-    return render_template('homepage.html', user_first_name=user_first_name)
+    # Retrieve user's first_name and role from the user object
+    user_first_name = user.first_name
+    user_role = user.role
+
+    return render_template('homepage.html', user_first_name=user_first_name, user_role=user_role)
+
 
 # Handle logout
 @app.route("/logout")
