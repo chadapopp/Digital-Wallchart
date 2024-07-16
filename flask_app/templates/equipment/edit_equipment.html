@@ -1,9 +1,10 @@
 {% extends 'index.html' %}
 
 {% block content %}
+{% include '_back_button.html' %}
 <div class="container mt-5">
     <div class="container col-6">
-        <h1 class="text-center">{{equipment[0].number}} - {{equipment[0].name}}</h1>
+        <h1 class="text-center">{{ equipment[0].number }} - {{ equipment[0].name }}</h1>
         <div class="bg-white p-8 shadow-md rounded-lg max-w-md w-full">
             <form method="post" action="/edit_equipment/{{ project.id }}/{{ equipment[0].id }}">
                 <div class="mb-3">
@@ -22,50 +23,54 @@
                 </div>
                 <div class="mb-3">
                     <label for="number" class="form-label">Number</label>
-                    <input type="text" class="form-control" id="last_name" name="number" value="{{ equipment[0].number }}">
+                    <input type="text" class="form-control" id="number" name="number" value="{{ equipment[0].number }}">
                 </div>
                 <div class="mb-3">
                     <label for="scope" class="form-label">Scope</label>
                     <textarea class="form-control" id="scope" name="scope" rows="5">{{ equipment[0].scope }}</textarea>
                 </div>
-                <div class="table-responsive">
+            </form>
+        </div>
+    </div>
+</div>
+
+                <div class="table-responsive container">
                     <table class="table table-striped" id="equipment_table">
                         <thead>
                             <tr>
                                 {% for component in components %}
                                     <th>{{ component.name }}</th>
                                 {% endfor %}
-                                <th>View</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 {% for component in components %}
                                     <td>
-                                        {% for method in component.methods %}
-                                            <form action="{{ url_for('update_method_status', component_id=component.id, method_id=method.id) }}" method="POST" style="background-color: inherit;" class="text-center">
-                                                <label>{{ method.name }}</label>
-                                                <select name="status" onchange="this.form.submit()">
-                                                    <option value="Pending" {% if method.status == 'Pending' %}selected{% endif %}>Pending</option>
-                                                    <option value="In Progress" {% if method.status == 'In Progress' %}selected{% endif %}>In Progress</option>
-                                                    <option value="Completed" {% if method.status == 'Completed' %}selected{% endif %}>Completed</option>
-                                                </select>
-                                            </form>
-                                        {% endfor %}
+                                        <table class="table">
+                                            {% for method in component.methods %}
+                                            <tr>
+                                                <td class="badge text-wrap {% if method.status == 'Pending' %}
+                                                    bg-warning
+                                                    {% elif method.status == 'In Progress' %}
+                                                    bg-primary
+                                                    {% elif method.status == 'Complete' %}
+                                                    bg-success
+                                                    {% endif %}">
+                                                {{ method.method_type }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </table>
                                     </td>
                                 {% endfor %}
-                                <td>
-                                    <a href="/edit_equipment/{{ project.id }}/{{ equipment.id }}" class="btn btn-primary">View</a>
-                                </td>
                             </tr>
                         </tbody>
                     </table>
+                    <button type="submit" class="btn btn-primary">Edit</button>
+                    {% if user_role.role == 'admin' or user_role.role == 'owner' %}
+                        <a href="/manage_components/{{ project.id }}/{{ equipment[0].id }}" class="btn btn-success">Manage Components</a>
+                        <a href="/add_methods/{{ project.id }}/{{ equipment[0].id }}" class="btn btn-warning">Add Tasks</a>
+                        <a href="/delete_equipment/{{ project.id }}/{{ equipment[0].id }}" class="btn btn-danger">Remove Equipment</a>
+                    {% endif %}
                 </div>
-                <button type="submit" class="btn btn-primary">Edit</button>
-                <a href="/manage_components/{{ project.id }}/{{ equipment[0].id }}" class="btn btn-success">Manage Components</a>
-                <a href="/add_methods/{{ project.id }}/{{equipment[0].id}}" class="btn btn-warning">Add Tasks</a>
-            </form>
-        </div>
-    </div>
-</div>
 {% endblock %}
