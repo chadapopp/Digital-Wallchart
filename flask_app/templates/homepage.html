@@ -3,15 +3,15 @@
 {% block content %}
 <div class="container mt-5 d-flex flex-column align-items-center gap-4">
     <h1 class="container text-center mt-4">Welcome {{user_first_name}}</h1>
+        {% if user_role == 'admin' %}
         <div class="welcome-buttons">
             <h3><a href="/show_all_users">Users</a></h3>
         </div>
+        {% endif %}
         <div class="welcome-buttons">
             <h3><a href="/show_all_projects">Projects</a></h3>
         </div>
-        <div class="welcome-buttons">
-            <h3><a href="#">User Login</a></h3>
-        </div>
+        
 </div>
 
 {% endblock %}
