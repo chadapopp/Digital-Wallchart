@@ -9,8 +9,11 @@
                 <tr>
                     <th scope="col">Project Name</th>
                     <th scope="col">Company</th>
+                    {% if user_role.role == "admin" %}
                     <th scope="col">Users</th>
+                    {% endif %}
                     <th scope="col">View Project</th>
+                    
                 </tr>
             </thead>
             <tbody>
@@ -18,12 +21,15 @@
                 <tr>
                     <td>{{ project.project_name }}</td>
                     <td>{{ project.project_company }}</td>
+                    {% if user_role.role == "admin" %}
                     <td>
                         <a href="/view_users_per_project/{{project.id}}" class="btn btn-success">User(s)</a>
                     </td>
+                    {% endif %}
                     <td>
                         <a href="/view_project_by_id/{{project.id}}" class="btn btn-primary">View Project</a>
                     </td>
+                    
                 </tr>
                 {% endfor %}
             </tbody>
