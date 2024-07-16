@@ -1,0 +1,74 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    {% include '_back_button.html' %}
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1>Repairs for Project {{ project_id }}</h1>
+        </div>
+    </div>
+    <div class="row justify-content-center mt-4">
+        <div class="col-12">
+            <div id="loadingScreen" class="loading-screen" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+            <div class="table-responsive" id="repairsTableContainer">
+                <table class="table table-striped" id="repairsTable">
+                    <thead>
+                        <tr>
+                            <th>Equipment Number</th>
+                            <th>Component Name</th>
+                            <th>Repair Number</th>
+                            <th>Description</th>
+                            <th>Submitted By</th>
+                            <th>Document</th>
+                            <th>Status</th>
+                            <th>Submitted Date</th>
+                            <th>Completed Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if repairs %}
+                            {% for repair in repairs %}
+                            
+                            <tr>
+                                <td>{{ repair.equipment_number }}</td>
+                                <td>{{ repair.component_name }}</td>
+                                <td>{{ repair.repair_number }}</td>
+                                <td>{{ repair.description }}</td>
+                                <td>{{ repair.updated_by }}</td> <!-- Accessing the updated_by field -->
+                                <td>
+                                    {% if repair.file_path %}
+                                        <a href="{{ url_for('uploaded_file', filename=repair.file_path | basename) }}" target="_blank">View</a>
+                                    {% else %}
+                                        No document
+                                    {% endif %}
+                                </td>
+                                {% if repair.repair_status =="Complete" or repair.repair_status == 'Rejected' or repair.repair_status == 'Deferred' %}
+                                    <td class="text-success">{{repair.repair_status}}</td>
+                                {% else %}
+                                    <td><a href="/repairs/update_repair_status/{{repair.id}}" class="text-danger">{{repair.repair_status}}</a></td>
+                                {% endif %}
+                                <td>{{repair.created_at.strftime('%m/%d/%y') }}</td>
+                                    {% if repair.created_at == repair.updated_at %}
+                                        <td> </td>
+                                        {% else %}
+                                        <td>{{repair.updated_at.strftime('%m/%d/%y') }}</td>
+                                    {% endif %}
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="7">No repair information available</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

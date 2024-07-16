@@ -1,0 +1,41 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1>{{equipment.number}} Repairs</h1>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-4">
+            <div class="col-12">
+                <div id="loadingScreen" class="loading-screen" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+                <div class="table-responsive" id="repairsTableContainer">
+                    <table class="table table-striped" id="repairsTable">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Repair Number</th>
+                                <th>Description</th>
+                                <th>Document</th>
+                                <th>Update</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <td>{{component.name}}</td>
+                            <td>{{repair_info.repair_number}}</td>
+                            <td>{{repair_info.description}}</td>
+                            <td><a href="{{ url_for('uploaded_file', filename=repair_info.file_path | basename) }}" target="_blank">View Repair</a></td>
+                            <td><a href="#">Update</a></td>
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
