@@ -3,11 +3,14 @@
 {% block content %}
 <div class="p-4 mt-5">
     <div>
-        <a href="/project/status_page/{{project.id}}">View Status</a>
+        {% include '_back_button.html' %}
+        <a href="/project/status_page/{{project.id}}" class="btn btn-success mb-5">View Status</a>
+        <a href="/repairs/view_all_repairs/{{project.id}}" class="btn btn-warning mb-5">View Repairs</a>
     </div>
     <div class="tabs text-black">
         <ul class="nav nav-tabs" id="equipmentTabs">
             {% for equipment_type in equipment_types %}
+            <input type="hidden" id="currentTab" name="currentTab" value="{{ current_tab }}">
                 <li class="nav-item">
                     <a class="nav-link equipment-type-tab text-black {% if equipment_type.type == 'Exchanger' %}active{% endif %}" href="#" data-equipment-type="{{ equipment_type.type }}">{{ equipment_type.type }}</a>
                 </li>
@@ -16,157 +19,15 @@
     </div>
 
     <div id="equipmentTabContent">
-        {% include 'wallchart/equipment_table.html' %}
+        <!-- The equipment table content will be dynamically loaded here -->
     </div>
 </div>
 
 <!-- Hidden input to store current tab -->
-<input type="hidden" id="currentTab" name="currentTab" value="{{ current_tab }}">
+<input type="hidden" id="projectId" value="{{ project.id }}">
+
+
 {% endblock %}
 {% block scripts %}
-<script>
-    $(document).ready(function() {
-        var isLoading = false;
-    
-        function showLoadingScreen() {
-            if (!isLoading) {
-                $('#loadingScreen').show();
-                isLoading = true;
-            }
-        }
-    
-        function hideLoadingScreen() {
-            if (isLoading) {
-                $('#loadingScreen').hide();
-                isLoading = false;
-            }
-        }
-    
-        function loadEquipmentData(equipmentType) {
-            showLoadingScreen();
-            $.ajax({
-                url: '/view_wallchart/{{ project.id }}?equipment_type=' + equipmentType,
-                type: 'GET',
-                success: function(response) {
-                    $('#equipmentTabContent').html(response);
-                    hideLoadingScreen();
-                },
-                error: function(xhr, status, error) {
-                    console.error(error);
-                    hideLoadingScreen();
-                }
-            });
-        }
-    
-        var currentTab = $('#currentTab').val();
-        console.log('Initial currentTab value:', currentTab); // Logging
-        if (currentTab === "") {
-            currentTab = "Exchanger";
-            $('#currentTab').val(currentTab);
-        }
-        console.log('CurrentTab after check:', currentTab); // Logging
-        loadEquipmentData(currentTab);
-    
-        $(document).on('click', '.equipment-type-tab', function(e) {
-            e.preventDefault();
-            var equipmentType = $(this).data('equipment-type');
-            $('#currentTab').val(equipmentType);
-            loadEquipmentData(equipmentType);
-    
-            $('.equipment-type-tab').removeClass('active');
-            $(this).addClass('active');
-        });
-    
-        $(document).on('show.bs.modal', '#methodModal', function(event) {
-            var button = $(event.relatedTarget);
-            var methodId = button.data('method-id');
-            var componentId = button.data('component-id');
-            var methodStatus = button.data('method-status');
-            var equipmentId = button.data('equipment-id');
-    
-            var modal = $(this);
-            modal.find('#methodId').val(methodId);
-            modal.find('#componentId').val(componentId);
-            modal.find('#equipmentId').val(equipmentId);
-            modal.find('#methodStatus').val(methodStatus);
-    
-            if (methodStatus === 'Repair Required') {
-                $('#repairFields').show();
-    
-                $.ajax({
-                    url: '/get_repair_details',
-                    type: 'GET',
-                    data: {
-                        component_id: componentId,
-                        equipment_id: equipmentId
-                    },
-                    success: function(response) {
-                        if (response.description) {
-                            $('#currentRepairFields').show();
-                            $('#currentRepairNumber').val(response.repair_number);
-                            $('#currentDescription').val(response.description);
-                            if (response.file_path) {
-                                $('#currentFileLink').attr('href', '/uploads/' + response.file_path).show();
-                            } else {
-                                $('#currentFileLink').hide();
-                            }
-                        } else {
-                            $('#currentRepairFields').hide();
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(error);
-                    }
-                });
-    
-            } else {
-                $('#repairFields').hide();
-                $('#currentRepairFields').hide();
-            }
-        });
-    
-        $(document).on('submit', '#methodStatusForm', function(event) {
-            event.preventDefault();
-            showLoadingScreen();
-            $('#methodModal').modal('hide');
-    
-            var formData = new FormData(this);
-            var currentTab = $('#currentTab').val();
-            formData.append('currentTab', currentTab);
-    
-        
-            $.ajax({
-                type: 'POST',
-                url: $(this).attr('action'),
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function(response) {
-                    console.log('Method status updated, reloading tab:', response.currentTab); // Logging
-                    var newTab = response.currentTab || currentTab; // Default to currentTab if empty
-                    $('#currentTab').val(newTab);
-                    loadEquipmentData(newTab);
-                    // Remove 'active' class from all tabs and add to the clicked tab
-                    $('.equipment-type-tab').removeClass('active');
-                    $('a[data-equipment-type="' + newTab + '"]').addClass('active');
-                    hideLoadingScreen();
-                },
-                error: function(xhr, status, error) {
-                    console.log('Error updating method status:', error);
-                    hideLoadingScreen();
-                }
-            });
-        });
-    
-        $(document).on('change', '#methodStatus', function() {
-            if ($(this).val() === 'Repair Required') {
-                $('#repairFields').show();
-            } else {
-                $('#repairFields').hide();
-            }
-        });
-    });
-    
-
-</script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}
