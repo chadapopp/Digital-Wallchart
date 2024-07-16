@@ -21,12 +21,14 @@
                     <td>
                         <a href="/view_equipment_per_project/{{project.id}}" class="btn btn-warning">View Equipment</a>
                     </td>
+                    {% if user_role == 'admin' %}
                     <td>
                         <a href="/view_users_per_project/{{project.id}}" class="btn btn-success">User(s)</a>
                     </td>
                     <td>
                         <a href="/edit_project/{{ project.id }}" class="btn btn-primary">Edit Project</a>
                     </td>
+                    {% endif %}
                 </tr>
             
             </tbody>
