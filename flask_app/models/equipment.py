@@ -32,7 +32,8 @@ class Equipment:
     @classmethod
     def add_single_equipment(cls, data):
         query = "INSERT INTO equipment (project_id, user_id, name, number, type, scope) VALUES (%(project_id)s, %(user_id)s, %(name)s, %(number)s, %(type)s, %(scope)s)"
-        connectToMySQL(cls.DB).query_db(query, data)
+        result = connectToMySQL(cls.DB).query_db(query, data)
+        return result
 
 
     @classmethod
@@ -82,22 +83,57 @@ class Equipment:
 
 
     @classmethod
-    def delete_equipment(cls, data):
-        query = "DELETE FROM equipment WHERE id=%(id)s"
-        data = {"id": data}
-        results = connectToMySQL(cls.DB).query_db(query, data)
-        return results
-    
-    @classmethod
-    def get_exchangers_by_project(cls, project_id):
-        query = """SELECT *
-                FROM equipment
-                WHERE project_id = %(project_id)s
-                AND type = 'exchanger'"""
-        data = {"project_id": project_id}  # Pass project_id as a dictionary
-        results = connectToMySQL(cls.DB).query_db(query, data)
-        return results
-    
+    def delete_equipment(cls, equipment_id):
+        # Get the connection
+        connection = connectToMySQL(cls.DB)
+        
+        try:
+            with connection.connection.cursor() as cursor:
+                # Start a transaction
+                cursor.execute("START TRANSACTION")
+                
+                # Delete associated repairs
+                delete_repairs_query = """
+                    DELETE r FROM repairs r
+                    JOIN components c ON r.component_id = c.id
+                    WHERE c.equipment_id = %(id)s
+                """
+                cursor.execute(delete_repairs_query, {"id": equipment_id})
+
+                # Delete associated component methods
+                delete_component_methods_query = """
+                    DELETE cm FROM component_methods cm
+                    JOIN components c ON cm.component_id = c.id
+                    WHERE c.equipment_id = %(id)s
+                """
+                cursor.execute(delete_component_methods_query, {"id": equipment_id})
+
+                # Delete associated components
+                delete_components_query = """
+                    DELETE FROM components WHERE equipment_id = %(id)s
+                """
+                cursor.execute(delete_components_query, {"id": equipment_id})
+
+                # Delete the equipment
+                delete_equipment_query = """
+                    DELETE FROM equipment WHERE id = %(id)s
+                """
+                cursor.execute(delete_equipment_query, {"id": equipment_id})
+
+                # Commit the transaction
+                connection.connection.commit()
+            
+            return True
+        except Exception as e:
+            # Rollback the transaction in case of an error
+            connection.connection.rollback()
+            print(f"Error: {e}")
+            return False
+        finally:
+            connection.connection.close()
+
+
+
     @classmethod
     def get_equipment_number_by_component_id(cls, component_id):
         query = """SELECT equipment.number
