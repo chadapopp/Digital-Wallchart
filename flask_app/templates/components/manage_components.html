@@ -1,7 +1,7 @@
 {% extends 'index.html' %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+<div class="d-flex justify-content-center align-items-center text-white" style="min-height: 100vh;">
     <div class="p-4 mt-5 container">
         <div class="text-center mb-4">
             <a href="{{ url_for('wallchart', project_id=project_id) }}" class="btn btn-secondary">Back to Wallchart</a>
@@ -14,27 +14,28 @@
             {% for component in components %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     {{ component.name }}
-                    <button class="btn btn-primary edit-button" data-id="{{ component.id }}" data-name="{{ component.name }}">Edit</button>
+                    <button class="btn btn-secondary edit-button" data-id="{{ component.id }}" data-name="{{ component.name }}">Edit</button>
                 </li>
             {% endfor %}
         </ul>
         
         <!-- Form to Add New Components -->
-        <h3 class="text-center">Add New Components</h3>
-        <form id="add-component-form" action="{{ url_for('manage_components', project_id=project_id, equipment_id=equipment_id) }}" method="POST" class="col-6 mx-auto">
+        <h3 class="text-center text-white">Add New Components</h3>
+        <form id="add-component-form" style="background-color: transparent;" action="{{ url_for('manage_components', project_id=project_id, equipment_id=equipment_id) }}" method="POST" class="col-6 mx-auto">
             <div id="component-fields">
                 <div class="form-group">
                     <select class="form-control mb-2" name="components[]">
                         {% for component in predetermined_components %}
                             <option value="{{ component }}">{{ component }}</option>
                         {% endfor %}
-                        <option value="other">Other</option>
+                        <option value="custom">Custom</option>
                     </select>
-                    <input type="text" class="form-control mb-2 d-none custom-input" name="custom_components[]" placeholder="Enter component name">
+                    <input type="text" class="form-control mb-2 d-none custom-input" name="custom_components[]" placeholder="Enter custom component name">
                 </div>
             </div>
             <button type="button" class="btn btn-secondary mt-3" id="add-component-field">Add Another Component</button>
-            <button type="submit" class="btn btn-primary mt-3 d-block mx-auto">Add Components</button>
+            <a href="/add_methods/{{ project_id }}/{{ equipment_id }}" class="btn btn-warning mt-3">Add Tasks</a>
+            <button type="submit" class="btn btn-primary mt-3 d-block mx-auto">Save Components</button>
         </form>
     </div>
 </div>
@@ -91,6 +92,9 @@
         </div>
     </div>
 </div>
+
+<!-- Hidden input to store predetermined components data -->
+<input type="hidden" id="predetermined-components" value='{{ predetermined_components|tojson }}'>
 
 {% endblock %}
 
