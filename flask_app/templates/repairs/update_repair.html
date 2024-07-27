@@ -1,9 +1,9 @@
 {% extends 'index.html' %}
 
 {% block content %}
-<div class="container">
-    <form method="POST" action="{{ url_for('update_repair_status', repair_id=repair.id) }}">
-        <div class="form-group">
+<div class="container text-white">
+    <form method="POST" style="background-color: transparent;" action="{{ url_for('update_repair_status', repair_id=repair.id) }}">
+        <div class="form-group col-3 mx-auto">
             <label for="status">Repair Status</label>
             <select class="form-control" id="status" name="status">
                 <option value="In Progress" {% if repair.repair_status == 'In Progress' %}selected{% endif %}>In Progress</option>
@@ -11,8 +11,8 @@
                 <option value="Deferred" {% if repair.repair_status == 'Deferred' %}selected{% endif %}>Deferred</option>
                 <option value="Rejected" {% if repair.repair_status == 'Rejected' %}selected{% endif %}>Rejected</option>
             </select>
+            <button type="submit" class="btn btn-primary mt-5">Update Status</button>
         </div>
-        <button type="submit" class="btn btn-primary">Update Status</button>
     </form>
 </div>
 {% endblock %}
