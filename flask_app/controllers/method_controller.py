@@ -149,3 +149,6 @@ def get_component_status():
         all_methods[component_id] = methods
 
     return jsonify(all_methods)
+
+
+
