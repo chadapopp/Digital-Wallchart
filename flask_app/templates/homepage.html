@@ -1,8 +1,10 @@
 {% extends 'index.html' %}
 
 {% block content %}
-<div class="container mt-5 d-flex flex-column align-items-center gap-4">
-    <h1 class="container text-center mt-4">Welcome {{user_first_name}}</h1>
+<div class="page-background">
+
+    <div class="container d-flex flex-column align-items-center gap-4 fade-in" id="fade-in-section">
+        <img src="/static/images/logo.png" alt="Logo" class="img-fluid">
         {% if user_role == 'admin' %}
         <div class="welcome-buttons">
             <h3><a href="/show_all_users">Users</a></h3>
@@ -11,7 +13,15 @@
         <div class="welcome-buttons">
             <h3><a href="/show_all_projects">Projects</a></h3>
         </div>
-        
+    </div>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            document.getElementById('fade-in-section').classList.add('fade-in-visible');
+        }, 500); // Adjust the delay as needed
+    });
+</script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}
