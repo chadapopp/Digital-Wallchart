@@ -26,27 +26,31 @@ class User_Projects:
             WHERE projects.id = %(project_id)s
         """
         data = {'project_id': project_id}
-        print("query_data:", data)
         result = connectToMySQL(cls.DB).query_db(query, data)
-        print('result:', result)
         if result: 
             return result  # Return the list of users
         else: 
             return []  # Return an empty list if no users found
-
-
-
-
-
     
+    
+    @staticmethod
+    def is_user_assigned(user_id, project_id):
+        query = "SELECT COUNT(*) as count FROM user_projects WHERE user_id = %(user_id)s AND project_id = %(project_id)s"
+        data = {
+            "user_id": user_id,
+            "project_id": project_id
+        }
+        result = connectToMySQL("digital_wallchart_schema").query_db(query, data)
+        return result[0]['count'] > 0
 
-    # @classmethod
-    # def get_username_by_id(cls, user_id):
-    #     query = "SELECT first_name, last_name FROM users WHERE id = %(user_id)s"
-    #     data = {'user_id': user_id}
-    #     result = connectToMySQL(cls.DB).query_db(query, data)
-    #     return result[0]
-
+    @staticmethod
+    def remove_user(user_id, project_id):
+        query = "DELETE FROM user_projects WHERE user_id = %(user_id)s AND project_id = %(project_id)s"
+        data = {
+            "user_id": user_id,
+            "project_id": project_id
+        }
+        return connectToMySQL("digital_wallchart_schema").query_db(query, data)
 
 
 
