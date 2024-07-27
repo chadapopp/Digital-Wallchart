@@ -10,14 +10,16 @@
         <div class="welcome-buttons">
             <h3><a href="/view_equipment_per_project/{{project.id}}">View Equipment</a></h3>
         </div>
+        {% if session['user_role'] == 'admin' %}
         <div class="welcome-buttons">
-            <h3><a href="/upload_all/{{ project.id }}">Add Equipment and Components</a></h3>
+            <h3><a href="/upload_all/{{ project.id }}">Upload Equipment and Components</a></h3>
         </div>
         <div class="welcome-buttons">
-            <h3><a href="#">View Users</a></h3>
+            <h3><a href="/view_users_per_project/{{project.id}}">View Users</a></h3>
         </div>
         <div class="welcome-buttons">
-            <h3><a href="#">Add/Edit Users</a></h3>
+            <h3><a href="/add_user_to_project/{{ project.id }}">Add/Edit Users</a></h3>
         </div>
+        {% endif %}
 </div>
 {% endblock %}
