@@ -34,7 +34,6 @@ class Projects:
         projects = []
         for project in result:
             projects.append(cls(project))
-        print(projects)
         return projects
     
     @classmethod
@@ -46,8 +45,81 @@ class Projects:
         return cls(result[0])
     
     @classmethod
+    def get_projects_by_user_id(cls, user_id):
+        query = """
+        SELECT projects.* FROM projects
+        JOIN user_projects ON projects.id = user_projects.project_id
+        WHERE user_projects.user_id = %(user_id)s
+        """
+        result = connectToMySQL(cls.DB).query_db(query, {'user_id': user_id})
+        projects = []
+        for project in result:
+            projects.append(project)
+        return projects
+    
+
+    @classmethod
     def remove_project(cls, project_id):
-        query = "DELETE FROM projects WHERE id = %(project_id)s"
-        result = connectToMySQL(cls.DB).query_db(query, {'project_id':project_id})
-        return result
+        connection = connectToMySQL(cls.DB)
+        cursor = connection.connection.cursor()
+
+        try:
+            # Start a transaction
+            cursor.execute("START TRANSACTION")
+            
+            delete_user_projects_query = """
+                DELETE FROM user_projects WHERE project_id = %(project_id)s
+            """
+            cursor.execute(delete_user_projects_query, {"project_id": project_id})
+            
+            # Delete associated repairs
+            delete_repairs_query = """
+                DELETE r FROM repairs r
+                JOIN components c ON r.component_id = c.id
+                JOIN equipment e ON c.equipment_id = e.id
+                WHERE e.project_id = %(project_id)s
+            """
+            cursor.execute(delete_repairs_query, {"project_id": project_id})
+
+            # Delete associated component methods
+            delete_component_methods_query = """
+                DELETE cm FROM component_methods cm
+                JOIN components c ON cm.component_id = c.id
+                JOIN equipment e ON c.equipment_id = e.id
+                WHERE e.project_id = %(project_id)s
+            """
+            cursor.execute(delete_component_methods_query, {"project_id": project_id})
+
+            # Delete associated components
+            delete_components_query = """
+                DELETE c FROM components c
+                JOIN equipment e ON c.equipment_id = e.id
+                WHERE e.project_id = %(project_id)s
+            """
+            cursor.execute(delete_components_query, {"project_id": project_id})
+
+            # Delete associated equipment
+            delete_equipment_query = """
+                DELETE FROM equipment WHERE project_id = %(project_id)s
+            """
+            cursor.execute(delete_equipment_query, {"project_id": project_id})
+
+            # Delete the project
+            delete_project_query = """
+                DELETE FROM projects WHERE id = %(project_id)s
+            """
+            cursor.execute(delete_project_query, {"project_id": project_id})
+
+            # Commit the transaction
+            cursor.execute("COMMIT")
+            
+            return True
+        except Exception as e:
+            # Rollback the transaction in case of an error
+            cursor.execute("ROLLBACK")
+            print(f"Error: {e}")
+            return False
+        finally:
+            cursor.close()
+            connection.connection.close()
 
