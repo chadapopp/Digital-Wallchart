@@ -143,3 +143,10 @@ class Repairs:
         """
         data = (component_id, method_id, equipment_id)
         return connectToMySQL(cls.DB).query_db(query,data)
+    
+    @classmethod
+    def delete_repair(cls, data):
+        query = "DELETE FROM repairs WHERE id=%(id)s"
+        data = {"id": data}
+        results = connectToMySQL(cls.DB).query_db(query, data)
+        return results
