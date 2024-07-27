@@ -2,11 +2,11 @@
 
 {% block content %}
 <!-- Main content -->
-<div class="container">
-    <div class="centered-form">
-        <div class="bg-white p-8 shadow-md rounded-lg max-w-md w-full">
+<div class="container text-white">
+    <div class="centered-form" style="background-color: transparent;">
+        <div class="p-8 shadow-md rounded-lg max-w-md w-full">
             <!-- login form -->
-            <form method="post" action="/create_user">
+            <form method="post" class="text-white" action="/create_user" style="background-color: transparent;">
                 <div class="mb-3">
                     <label for="first_name" class="form-label">First Name</label>
                     <input type="text" class="form-control" id="first_name" aria-describedby="emailHelp" name="first_name">
@@ -22,6 +22,10 @@
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
                     <input type="password" class="form-control" id="password" name="password">
+                </div>
+                <div class="mb-3">
+                    <label for="user_name" class="form-label">User Name (For Logging In)</label>
+                    <input type="text" class="form-control" id="user_name" name="user_name">
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="role">Permissions</label>
