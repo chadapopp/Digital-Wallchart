@@ -1,5 +1,4 @@
 console.log('repair.js loaded');
-console.lo
 document.addEventListener("DOMContentLoaded", function() {
     console.log('DOM fully loaded and parsed'); // Debugging log
 
@@ -45,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                     </div>
                                     <div class="mb-3">
                                         <label for="repairDocument-${repair.id}" class="form-label">Repair Document</label>
-                                        <a id="repairFileLink-${repair.id}" href="/uploads/${repair.file_path}" target="_blank">View Document</a>
+                                        <a id="repairFileLink-${repair.id}" href="/uploads/path:${repair.file_path}" target="_blank">View Document</a>
                                     </div>
                                     <button type="submit" class="btn btn-primary">Update Status</button>
                                 </form>
