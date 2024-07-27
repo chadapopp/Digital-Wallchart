@@ -1,76 +1,133 @@
 {% extends 'index.html' %}
 
 {% block content %}
-{% include '_back_button.html' %}
-<div class="container mt-5">
-    <div class="container col-6">
-        <h1 class="text-center">{{ equipment[0].number }} - {{ equipment[0].name }}</h1>
-        <div class="bg-white p-8 shadow-md rounded-lg max-w-md w-full">
-            <form method="post" action="/edit_equipment/{{ project.id }}/{{ equipment[0].id }}">
-                <div class="mb-3">
-                    <label for="type" class="form-label">Type</label>
-                    <select class="form-select" id="type" name="type">
-                        <option value="Select">Select a Type</option>
-                        <option value="Exchanger" {% if equipment[0].type == 'Exchanger' %} selected {% endif %}>Exchanger</option>
-                        <option value="Tower" {% if equipment[0].type == 'Tower' %} selected {% endif %}>Tower</option>
-                        <option value="Drum" {% if equipment[0].type == 'Drum' %} selected {% endif %}>Drum</option>
-                        <option value="Heater" {% if equipment[0].type == 'Heater' %} selected {% endif %}>Heater</option>
-                    </select>
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+            <!-- Buttons Section -->
+            {% if user_role.role == 'admin' %}
+            <div class="d-flex flex-column button-container">
+                {% include '_back_button.html' %}
+                <a href="/manage_components/{{ project.id }}/{{ equipment[0].id }}" class="btn btn-success mb-2">Manage Components</a>
+                <a href="/add_methods/{{ project.id }}/{{ equipment[0].id }}" class="btn btn-warning mb-2">Add Tasks</a>
+                <a href="/delete_equipment/{{ project.id }}/{{ equipment[0].id }}" class="btn btn-danger mb-2" onclick="confirmRemoval(event)">Remove Equipment</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-10">
+            <!-- Equipment Information Section -->
+            <div class="container">
+                <div class="container col-12">
+                    <h1 class="text-center text-white mb-4">{{ equipment[0].number }} - {{ equipment[0].name }}</h1>
+                    <div class="p-8 shadow-md rounded-lg max-w-md w-full">
+                        <form method="post" action="/edit_equipment/{{ project.id }}/{{ equipment[0].id }}" style="background: transparent;">
+                            <div class="mb-3">
+                                <label for="type" class="form-label text-white">Type:</label>
+                                {% if user_role.role == 'admin' %}
+                                <select class="form-select" id="type" name="type">
+                                    <option value="Select">Select a Type</option>
+                                    <option value="Exchanger" {% if equipment[0].type == 'Exchanger' %} selected {% endif %}>Exchanger</option>
+                                    <option value="Tower" {% if equipment[0].type == 'Tower' %} selected {% endif %}>Tower</option>
+                                    <option value="Drum" {% if equipment[0].type == 'Drum' %} selected {% endif %}>Drum</option>
+                                    <option value="Heater" {% if equipment[0].type == 'Heater' %} selected {% endif %}>Heater</option>
+                                </select>
+                                {% else %}
+                                <p class="form-control-static text-white">{{ equipment[0].type }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="name" class="form-label text-white">Name:</label>
+                                {% if user_role.role == 'admin' %}
+                                <input type="text" class="form-control" id="name" name="name" value="{{ equipment[0].name }}">
+                                {% else %}
+                                <p class="form-control-static text-white">{{ equipment[0].name }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="number" class="form-label text-white">Number:</label>
+                                {% if user_role.role == 'admin' %}
+                                <input type="text" class="form-control" id="number" name="number" value="{{ equipment[0].number }}">
+                                {% else %}
+                                <p class="form-control-static text-white">{{ equipment[0].number }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="scope" class="form-label text-white">Scope:</label>
+                                {% if user_role.role == 'admin' %}
+                                <textarea class="form-control" id="scope" name="scope" rows="5">{{ equipment[0].scope }}</textarea>
+                                {% else %}
+                                <p class="form-control-static text-white">{{ equipment[0].scope }}</p>
+                                {% endif %}
+                            </div>
+                            {% if user_role.role == 'admin' %}
+                            <button type="submit" class="btn btn-secondary mb-2">Save</button>
+                            {% endif %}
+                        </form>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="name" name="name" value="{{ equipment[0].name }}">
-                </div>
-                <div class="mb-3">
-                    <label for="number" class="form-label">Number</label>
-                    <input type="text" class="form-control" id="number" name="number" value="{{ equipment[0].number }}">
-                </div>
-                <div class="mb-3">
-                    <label for="scope" class="form-label">Scope</label>
-                    <textarea class="form-control" id="scope" name="scope" rows="5">{{ equipment[0].scope }}</textarea>
-                </div>
-            </form>
+            </div>
+            <div class="table-responsive" style="background: transparent;">
+                <table class="table table-dark table-striped table-bordered" id="equipment_table" style="background: transparent;">
+                    <thead>
+                        <tr>
+                            {% for component in components %}
+                                <th>{{ component.name }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            {% for component in components %}
+                                <td>
+                                    <table class="table">
+                                        {% for method in component.methods %}
+                                        <tr>
+                                            <td class="badge text-wrap {% if method.status == 'Repair Required' %}
+                                                bg-danger
+                                                {% elif method.status == 'In Progress' %}
+                                                bg-primary
+                                                {% elif method.status == 'Complete' %}
+                                                bg-success
+                                                {% endif %}">
+                                            {{ method.method_type }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
-                <div class="table-responsive container">
-                    <table class="table table-striped" id="equipment_table">
-                        <thead>
-                            <tr>
-                                {% for component in components %}
-                                    <th>{{ component.name }}</th>
-                                {% endfor %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                {% for component in components %}
-                                    <td>
-                                        <table class="table">
-                                            {% for method in component.methods %}
-                                            <tr>
-                                                <td class="badge text-wrap {% if method.status == 'Pending' %}
-                                                    bg-warning
-                                                    {% elif method.status == 'In Progress' %}
-                                                    bg-primary
-                                                    {% elif method.status == 'Complete' %}
-                                                    bg-success
-                                                    {% endif %}">
-                                                {{ method.method_type }}</td>
-                                                </tr>
-                                            {% endfor %}
-                                        </table>
-                                    </td>
-                                {% endfor %}
-                            </tr>
-                        </tbody>
-                    </table>
-                    <button type="submit" class="btn btn-primary">Edit</button>
-                    {% if user_role.role == 'admin' or user_role.role == 'owner' %}
-                        <a href="/manage_components/{{ project.id }}/{{ equipment[0].id }}" class="btn btn-success">Manage Components</a>
-                        <a href="/add_methods/{{ project.id }}/{{ equipment[0].id }}" class="btn btn-warning">Add Tasks</a>
-                        <a href="/delete_equipment/{{ project.id }}/{{ equipment[0].id }}" class="btn btn-danger">Remove Equipment</a>
-                    {% endif %}
-                </div>
+{% block styles %}
+<style>
+    .table {
+        background: transparent !important;
+    }
+    .table th, .table td {
+        background: transparent !important;
+    }
+    .table th {
+        color: white !important;
+    }
+    .button-container {
+        margin-left: -20px; /* Adjust this value to move buttons further to the left */
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function confirmRemoval(event) {
+        if (!confirm("Are you sure you want to remove this equipment? All data for the equipment will be lost.")) {
+            event.preventDefault(); // Prevent the default action if the user clicks "Cancel"
+        }
+    }
+</script>
 {% endblock %}
