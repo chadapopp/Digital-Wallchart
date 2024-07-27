@@ -2,11 +2,12 @@
 
 {% block content %}
 <!-- Main content -->
-<div class="container">
-    <div class="centered-form">
-        <div class="bg-white p-8 shadow-md rounded-lg max-w-md w-full">
+<div class="container text-white">
+    <div class="centered-form" style="background-color: transparent;">
+        <div class="p-8 shadow-md rounded-lg max-w-md w-full">
+            <h3 class="mb-5">Edit Details for <br>{{user.first_name}} {{user.last_name}}</h3>
             <!-- Edit user form -->
-            <form method="post" action="/edit_user/{{ user.id }}">
+            <form method="post" action="/edit_user/{{ user.id }}" style="background-color: transparent;">
                 <div class="mb-3">
                     <label for="first_name" class="form-label">First Name</label>
                     <input type="text" class="form-control" id="first_name" aria-describedby="emailHelp" name="first_name" value="{{ user.first_name }}">
@@ -31,7 +32,7 @@
                         <option value="admin" {% if user.role == 'admin' %} selected {% endif %}>Admin</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary">Edit</button>
+                <button type="submit" class="btn btn-secondary">Edit</button>
             </form>
         </div>
     </div>
