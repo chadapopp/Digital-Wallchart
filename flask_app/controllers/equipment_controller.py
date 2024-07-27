@@ -85,7 +85,7 @@ def upload_all(project_id):
     return render_template('equipment/add_equipment.html', project_id=project_id, equipment=equipment)
 
 
-@app.route('/add_single_equipment/<int:project_id>', methods = ['GET', 'POST'])
+@app.route('/add_single_equipment/<int:project_id>', methods=['GET', 'POST'])
 def add_single_equipment(project_id):
     if request.method == 'POST':
         data = {
@@ -96,8 +96,8 @@ def add_single_equipment(project_id):
             'scope': request.form['scope'],
             'user_id': session.get('user_id')
         }
-        Equipment.add_single_equipment(data)
-        return redirect(f'/wallchart/{project_id}')
+        equipment_id = Equipment.add_single_equipment(data)
+        return redirect(url_for('manage_components', project_id=project_id, equipment_id=equipment_id))
     return render_template('equipment/add_single_equipment.html', project_id=project_id)
 
 @app.route('/view_equipment_per_project/<int:project_id>')
@@ -146,8 +146,23 @@ def edit_equipment(project_id, equipment_id):
 
 @app.route('/delete_equipment/<int:project_id>/<int:equipment_id>', methods=['GET', 'POST'])
 def remove_equipment(project_id, equipment_id):
-    Equipment.delete_equipment(equipment_id)
+    # Retrieve equipment details before deletion
+    equipment = Equipment.get_equipment_by_id(equipment_id)
+    
+    if not equipment:
+        flash(f'Equipment with ID {equipment_id} not found', 'danger')
+        return redirect(f"/view_equipment_per_project/{project_id}")
+    
+    equipment_number = equipment[0]['number']  # Assuming `equipment` is a list with one dictionary
+    equipment_name = equipment[0]['name']
+    
+    if Equipment.delete_equipment(equipment_id):
+        flash(f'Equipment "{equipment_number} - {equipment_name}" deleted successfully', 'success')
+    else:
+        flash(f'Failed to delete equipment "{equipment_number} - {equipment_name}"', 'danger')
+    
     return redirect(f"/view_equipment_per_project/{project_id}")
+
     
 
 
