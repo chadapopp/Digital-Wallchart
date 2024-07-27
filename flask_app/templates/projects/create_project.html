@@ -3,16 +3,16 @@
 {% block content %}
 <!-- Main content -->
 <div class="container">
-    <div class="centered-form">
-        <div class="bg-white p-8 shadow-md rounded-lg max-w-md w-full">
+    <div class="centered-form" style="background-color: transparent;">
+        <div class="p-8 shadow-md rounded-lg max-w-md w-full">
             <!-- login form -->
-            <form method="post" action="/create_project">
+            <form method="post" action="/create_project" style="background-color: transparent;">
                 <div class="mb-3">
-                    <label for="project_name" class="form-label">Name</label>
+                    <label for="project_name" class="form-label text-white">Project Name</label>
                     <input type="text" class="form-control" id="project_name" aria-describedby="emailHelp" name="project_name">
                 </div>
                 <div class="mb-3">
-                    <label for="project_company" class="form-label">Company</label>
+                    <label for="project_company" class="form-label text-white">Company</label>
                     <input type="text" class="form-control" id="project_company" name="project_company">
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
