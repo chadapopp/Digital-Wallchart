@@ -1,42 +1,28 @@
-/* @keyframes rotate {
-    from{
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-@-webkit-keyframes rotate {
-    from {
-        -webkit-transform: rotate(0deg);
-    }
-    to {
-        -webkit-transform: rotate(360deg);
-    }
-}
-.load {
-    width: 100px;
-    height: 100px;
-    margin: 110px auto 0;
-    border: solid 10px #8822aa;
-    border-radius: 50%;
-    border-right-color: transparent;
-    border-bottom-color: transparent;
-    -webkit-transition: all 0.5s ease-in;
-    -webkit-animation-name: rotate;
-    -webkit-animation-duration: 1.0s;
-    -webkit-animation-iteration-count: infinite;
-    -webkit-animation-timing-function: linear;
-    transition: all 0.5s ease-in;
-    animation-name: rotate;
-    animation-duration: 1.0s;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
-} */
-
 body {
-    background-color: gray;
+    background: linear-gradient(to top, black, gray);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+.page-background {
+    min-height: 100vh;
+    background: linear-gradient(to top, black, gray);
+}
+
+.fade-in {
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+}
+
+.fade-in-visible {
+    opacity: 1;
+}
+
+.container {
+    position: relative;
+    z-index: 2;
+    padding: 20px;
 }
 
 .welcome-buttons {
@@ -51,7 +37,7 @@ body {
     width: 40%;
 }
 
-.welcome-buttons a{
+.welcome-buttons a {
     text-decoration: none;
     color: black;
 }
@@ -145,12 +131,13 @@ form {
 
 .badge-success {
     background-color: green;
-    color: white;
+    
+    
 }
 
 .badge-danger {
     background-color: red;
-    color: white;
+    
 }
 
 .badge-warning {
@@ -201,6 +188,7 @@ form {
 
 .loading-screen {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     position: fixed;
@@ -239,5 +227,31 @@ form {
 .scope:hover {
     white-space: normal; /* Allow text to wrap on hover */
     overflow: auto; /* Add scroll bar on hover */
+}
+
+
+.table th.type-column,
+.table td.type-column {
+    width: 10%;
+}
+
+.table th.name-column,
+.table td.name-column {
+    width: 20%;
+}
+
+.table th.number-column,
+.table td.number-column {
+    width: 10%;
+}
+
+.table th.scope-column,
+.table td.scope-column {
+    width: 50%;
+}
+
+.table th.view-column,
+.table td.view-column {
+    width: 10%;
 }
 
