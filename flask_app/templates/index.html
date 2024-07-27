@@ -8,75 +8,97 @@
     {% block title %} <title>Digital Wall Chart</title> {% endblock %}
     {% block head %} 
     {% endblock %}
+    
 </head>
 <body style="padding-top: 60px;">
     <!-- Navbar -->
     <nav class="navbar navbar-dark bg-dark fixed-top mb-5">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Digital WallChart</a>
+            {% if session.logged_in %}
+                <a class="navbar-brand" href="#">Welcome {{ session.first_name }} {{ session.last_name }}</a>
+            {% else %}
+                <a class="navbar-brand" href="#">Digital WallChart</a>
+            {% endif %}
             <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
             </button>
             <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
-            <div class="offcanvas-header">
-                <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Dark offcanvas</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body">
-                <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/homepage">Home</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link" href="/logout">Logout</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Dropdown
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-dark">
-                    <li><a class="dropdown-item" href="#">Action</a></li>
-                    <li><a class="dropdown-item" href="#">Another action</a></li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li><a class="dropdown-item" href="#">Something else here</a></li>
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Dark offcanvas</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/homepage">Home</a>
+                        </li>
+                        {% if session.logged_in %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/logout">Logout</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/login">Login</a>
+                            </li>
+                        {% endif %}
                     </ul>
-                </li>
-                </ul>
-            </div>
+                </div>
             </div>
         </div>
     </nav>
-
+    
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mt-3">
+                {% for category, message in messages %}
+                    {% set alert_class = 'alert-info' %}
+                    {% if category == 'success' %}
+                        {% set alert_class = 'alert-success' %}
+                    {% elif category == 'error' %}
+                        {% set alert_class = 'alert-danger' %}
+                    {% elif category == 'warning' %}
+                        {% set alert_class = 'alert-warning' %}
+                    {% endif %}
+                    <div class="alert {{ alert_class }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
 
     {% block content %}
-    <!-- Main content -->
-    <div class="container">
-        <div class="centered-form">
-            <div class="bg-white p-8 shadow-md rounded-lg max-w-md w-full">
-                <!-- login form -->
-                <form method="post" action="/login">
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email address</label>
-                        <input type="email" class="form-control" id="email" aria-describedby="emailHelp" name="email">
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-            </div>
+    <div class="container d-flex justify-content-around align-items-center mt-5">
+        <!-- Logo -->
+        <div class="logo">
+            <img src="/static/images/logo.png" alt="Logo" class="img-fluid">
+        </div>
+        <!-- Login Form -->
+        <div class="p-4 shadow-md rounded-lg">
+            <h1 class="text-center mb-4 text-white">Login</h1>
+            <form method="post" style="background: transparent;" action="/login">
+                <div class="mb-3">
+                    <label for="user_name" class="form-label text-white">User Name</label>
+                    <input type="text" class="form-control" id="user_name" aria-describedby="emailHelp" name="user_name">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label text-white">Password</label>
+                    <input type="password" class="form-control" id="password" name="password">
+                </div>
+                <button type="submit" class="btn btn-secondary w-100">Submit</button>
+            </form>
         </div>
     </div>
+    <!-- Main content -->
     {% endblock %}
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    {% block scripts %}
-        
 
+    {% block scripts %}
     {% endblock %}
+</body>
+</html>
