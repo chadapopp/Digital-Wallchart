@@ -1,19 +1,19 @@
 $(document).ready(function() {
-    console.log('Main script loaded'); // Debugging log
-
     var isLoading = false;
     var projectId = $('#projectId').val(); // Read project ID from hidden input
 
     function showLoadingScreen() {
         if (!isLoading) {
-            $('#loadingScreen').show();
+            console.log('Showing loading screen');
+            $('#loadingScreen').css('display', 'flex'); // Directly set the display property to flex
             isLoading = true;
         }
     }
 
     function hideLoadingScreen() {
         if (isLoading) {
-            $('#loadingScreen').hide();
+            console.log('Hiding loading screen');
+            $('#loadingScreen').css('display', 'none'); // Directly set the display property to none
             isLoading = false;
         }
     }
@@ -27,28 +27,25 @@ $(document).ready(function() {
             success: function(response) {
                 console.log('Equipment data loaded successfully'); // Logging
                 $('#equipmentTabContent').html(response);
-                hideLoadingScreen();
+                hideLoadingScreen(); // Hide loading screen once data is loaded
             },
             error: function(xhr, status, error) {
-                console.error('Error loading equipment data:', error); // Logging
-                hideLoadingScreen();
+                console.error('Error loading equipment data:', error);
+                hideLoadingScreen(); // Hide loading screen even if there's an error
             }
         });
     }
 
     var currentTab = $('#currentTab').val();
-    console.log('Initial currentTab value:', currentTab); // Logging
     if (currentTab === "") {
         currentTab = "Exchanger";
         $('#currentTab').val(currentTab);
     }
-    console.log('CurrentTab after check:', currentTab); // Logging
     loadEquipmentData(currentTab);
 
     $(document).on('click', '.equipment-type-tab', function(e) {
         e.preventDefault();
         var equipmentType = $(this).data('equipment-type');
-        console.log('Tab clicked, equipment type:', equipmentType); // Logging
         $('#currentTab').val(equipmentType); // Update the hidden input value
         loadEquipmentData(equipmentType);
 
@@ -63,8 +60,6 @@ $(document).ready(function() {
         var componentId = button.data('component-id');
         var methodStatus = button.data('method-status');
         var equipmentId = button.data('equipment-id');
-
-        console.log('Showing method modal for method:', methodId, 'component:', componentId); // Debugging log
 
         var modal = $(this);
         modal.find('#methodId').val(methodId);
@@ -84,8 +79,6 @@ $(document).ready(function() {
                     equipment_id: equipmentId
                 },
                 success: function(response) {
-                    console.log('Received repair details:', response); // Debugging log
-
                     if (response.length === 0) {
                         $('#currentRepairFields').hide();
                     } else {
@@ -94,7 +87,7 @@ $(document).ready(function() {
                         $('#currentRepairNumber').val(repair.repair_number);
                         $('#currentDescription').val(repair.description);
                         if (repair.file_path) {
-                            $('#currentFileLink').attr('href', '/uploads/' + repair.file_path).show();
+                            $('#currentFileLink').attr('href', '/uploads/path:' + repair.file_path).show();
                         } else {
                             $('#currentFileLink').hide();
                         }
@@ -112,14 +105,11 @@ $(document).ready(function() {
     });
 
     $(document).on('show.bs.modal', '#repairModal', function(event) {
-        console.log('repairModal show.bs.modal event triggered'); // Debugging log
         var button = $(event.relatedTarget);
         var repairId = button.data('repair-id'); // Retrieve repair ID
         var componentId = button.data('component-id');
         var equipmentId = button.data('equipment-id');
         
-        console.log('Fetching repair details for repair:', repairId); // Debugging log
-
         $.ajax({
             url: '/get_repair_details',
             type: 'GET',
@@ -127,8 +117,6 @@ $(document).ready(function() {
                 repair_id: repairId // Use repair ID for specific repair details
             },
             success: function(response) {
-                console.log('Received repair details:', response); // Debugging log
-
                 var container = $('#repairDetailsContainer');
                 container.empty();  // Clear any existing content
                 
@@ -138,8 +126,8 @@ $(document).ready(function() {
                     var repair = response;
                     var repairEntry = `
                         <div class="repair-entry mb-3 p-3 border rounded">
-                            <form id="repairStatusForm-${repair.id}" method="POST" action="/repairs/update_repair_status/${repair.id}">
-                                <div class="mb-3">
+                            <form id="repairStatusForm-${repair.id}" method="POST" class="border rounded" action="/repairs/update_repair_status/${repair.id}">
+                                <div class="mb-3 p-2">
                                     <label for="repairStatus-${repair.id}" class="form-label">Status</label>
                                     <select class="form-select" id="repairStatus-${repair.id}" name="status">
                                         <option value="Repair Required" ${repair.repair_status === 'Repair Required' ? 'selected' : ''}>Repair Required</option>
@@ -154,7 +142,7 @@ $(document).ready(function() {
                                 </div>
                                 <div class="mb-3">
                                     <label for="repairDocument-${repair.id}" class="form-label">Repair Document</label>
-                                    <a id="repairFileLink-${repair.id}" href="/uploads/${repair.file_path}" target="_blank">View Document</a>
+                                    ${repair.file_path ? `<a id="repairFileLink-${repair.id}" href="/uploads/path:${repair.file_path}" target="_blank" class="btn btn-warning">View Document</a>` : 'No document available'}
                                 </div>
                                 <button type="submit" class="btn btn-primary">Update Status</button>
                             </form>
@@ -168,6 +156,7 @@ $(document).ready(function() {
             }
         });
     });
+    
 
     $(document).on('submit', '#methodStatusForm', function(event) {
         event.preventDefault();
@@ -176,7 +165,6 @@ $(document).ready(function() {
 
         var formData = new FormData(this);
         var currentTab = $('#currentTab').val();
-        console.log('Form submitted, currentTab:', currentTab); // Logging
         formData.append('currentTab', currentTab);
 
         $.ajax({
@@ -186,7 +174,6 @@ $(document).ready(function() {
             contentType: false,
             processData: false,
             success: function(response) {
-                console.log('Method status updated, reloading tab:', response.currentTab); // Logging
                 var newTab = response.currentTab || currentTab; // Default to currentTab if empty
                 $('#currentTab').val(newTab);
                 loadEquipmentData(newTab);
@@ -210,3 +197,4 @@ $(document).ready(function() {
         }
     });
 });
+
