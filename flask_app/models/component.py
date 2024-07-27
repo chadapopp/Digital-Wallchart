@@ -48,7 +48,6 @@ class Components:
             LEFT JOIN methods ON component_methods.method_id = methods.id
             WHERE components.equipment_id = %(equipment_id)s
             GROUP BY components.id
-            ORDER BY created_at ASC
         """
         data = {'equipment_id': equipment_id}
         results = connectToMySQL(cls.DB).query_db(query, data)
@@ -58,7 +57,15 @@ class Components:
                 component_data = dict(result)
                 component_data['methods'] = result['methods'].split(',') if result['methods'] else []
                 components.append(cls(component_data))
+        
+        # Define a specific order for components
+        order = ["External", "Shell", "Nozzles", "Shell Cover", "Bonnet","Inlet Channel", "Outlet Channel", "Channel", "Inlet Channel Cover", "Outlet Channel Cover", "Channel Cover", "Bundle", "Floating Head/Split Rings", "Header Boxes", "Tube Sheets", "Tubesheets", "Tubes", "Heads", "Primary Cyclones", "Secondary Cyclones", "Airgrid", "Internal Components", "Radiant Mechanical", "Radiant Refractory", "Convection Mechanical", "Convection Refractory", "Stack", "Closure", "Hydro", "Report"]
+        
+        # Sort components based on the defined order
+        components.sort(key=lambda x: order.index(x.name) if x.name in order else len(order))
+        
         return components
+
     
     @classmethod
     def get_component_by_id(cls, component_id):
