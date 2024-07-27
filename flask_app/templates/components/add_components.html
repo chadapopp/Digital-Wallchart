@@ -1,22 +1,33 @@
 {% extends 'index.html' %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="mb-4">Add Components</h1>
-    <div class="row">
-        <div class="col-md-6">
-            <form action="/add_components/{{project_id}}/{{equipment_id}}" method="post">
-                <div class="mb-3">
-                    <label for="name" class="form-label">Component Names (separated by comma):</label>
-                    <textarea id="name" name="name" class="form-control" rows="4"></textarea>
-                </div>
-                <input type="hidden" name="equipment_id" value="{{ equipment_id }}">
-                <input type="hidden" name="project_id" value="{{ project_id }}">
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="text-center w-100">
+        <h1 class="mb-4 text-white">Add Components for {{equipment_info.number}}</h1>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <form action="/add_components/{{project_id}}/{{equipment_id}}" style="background-color:transparent;" method="post">
+                    <div class="mb-3 text">
+                        <label class="form-label text-white">Select Components:</label>
+                        <div class="row g-3 text-white">
+                            {% for component in components_list %}
+                                <div class="col-6 col-md-4 col-lg-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="component_{{ loop.index }}" name="components" value="{{ component }}">
+                                        <label class="form-check-label" for="component_{{ loop.index }}">
+                                            {{ component }}
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <input type="hidden" name="equipment_id" value="{{ equipment_id }}">
+                    <input type="hidden" name="project_id" value="{{ project_id }}">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
-
 {% endblock %}
-
