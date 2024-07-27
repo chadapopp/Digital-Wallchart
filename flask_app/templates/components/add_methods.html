@@ -1,9 +1,10 @@
 {% extends 'index.html' %}
 
 {% block content %}
-<div class="p-4 mt-5 container">
+<div class="p-4 mt-5 container text-white">
+    <a href="{{ url_for('wallchart', project_id=project_id) }}" class="btn btn-secondary">Back to Wallchart</a>
     <h2 class="text-center">Add Methods to Components for {{ equipment.number }} - {{ equipment.name }}</h2>
-    <form action="{{ url_for('add_methods', project_id=project_id, equipment_id=equipment.id) }}" method="POST">
+    <form action="{{ url_for('add_methods', project_id=project_id, equipment_id=equipment.id) }}" style="background-color: transparent;" method="POST">
         <div class="table-responsive mt-4">
             <table class="table table-bordered">
                 <thead>
@@ -31,7 +32,7 @@
                 </tbody>
             </table>
         </div>
-        <button type="submit" class="btn btn-primary mt-3">Save Methods</button>
+        <button type="submit" class="btn btn-secondary mt-3">Save Methods</button>
     </form>
 </div>
 {% endblock %}
