@@ -13,16 +13,17 @@ def login_form():
 # Handle login form submission
 @app.route('/login', methods=['POST'])
 def login():
-    user = User.get_by_email(request.form.get('email'))
+    user = User.get_by_username(request.form.get('user_name'))
     if user:
         session['user_id'] = user.id
         session['first_name'] = user.first_name
+        session['last_name'] = user.last_name
+        session['user_role'] = user.role
+        session['logged_in'] = True
         return redirect('/homepage')
     else:
         flash('Invalid email or password', 'error')
         return redirect('/')
-
-
 
 # Display user's homepage
 @app.route('/homepage', methods=["GET"])
@@ -38,9 +39,10 @@ def user_homepage():
     
     # Retrieve user's first_name and role from the user object
     user_first_name = user.first_name
+    user_last_name = user.last_name
     user_role = user.role
 
-    return render_template('homepage.html', user_first_name=user_first_name, user_role=user_role)
+    return render_template('homepage.html', user_first_name=user_first_name, user_role=user_role, user_last_name = user_last_name)
 
 
 # Handle logout
@@ -49,33 +51,3 @@ def logout():
     # Clear session data
     session.clear()
     return redirect('/')
-
-
-# from flask_app.config.mysqlconnection import connect_to_mysql
-# # Function to hash passwords and update them in the database
-# def hash_and_update_passwords():
-#     # Create a connection to MySQL
-#     connection = connect_to_mysql('digital_wallchart_schema')
-
-#     # Export plaintext passwords from the database
-#     query = "SELECT id, password FROM users"
-#     passwords = connection.query_db(query)
-
-#     # Hash passwords using bcrypt
-#     hashed_passwords = []
-#     for user in passwords:
-#         id = user['id']
-#         password = user['password']
-#         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-#         hashed_passwords.append((id, hashed_password))
-
-
-#     # Update passwords in the database
-#     for id, hashed_password in hashed_passwords:
-#         query = "UPDATE users SET password = %s WHERE id = %s"
-#         connection.query_db(query, (hashed_password, id))
-
-#     print("Passwords hashed and updated successfully.")
-
-# # Call the function to hash passwords and update them in the database
-# hash_and_update_passwords()
