@@ -29,13 +29,18 @@ def create_project():
         # Render the create user page
         return render_template("/projects/create_project.html")
 
-@app.route('/show_all_projects', methods = ["GET"])
+@app.route('/show_all_projects', methods=["GET"])
 def show_all_projects():
-    projects = Projects.get_all()
     user_id = session.get('user_id')
-    user_role = User.get_user_by_id(user_id)
-    print("User role: ", user_role.role)
-    return render_template("/projects/all_projects.html", projects = projects, user_role = user_role)
+    user_role = session.get('user_role')
+
+    if user_role == 'admin':
+        projects = Projects.get_all()
+    else:
+        projects = Projects.get_projects_by_user_id(user_id)
+
+    return render_template("/projects/all_projects.html", projects=projects, user_role=user_role)
+
 
 @app.route('/add_user_to_project/<int:project_id>', methods=["GET", "POST"])
 def add_user_to_project(project_id):
@@ -47,28 +52,32 @@ def add_user_to_project(project_id):
         user = User.get_user_by_id(user_id)
 
         if user:
-            # If user is found, assign them to the specified project
-            project = Projects.get_project_by_id(project_id)
-            if project:
-                User_Projects.assign_user(user_id, project_id)  # Corrected usage
-                flash(f"User {user.first_name} {user.last_name} assigned to project {project.project_name}.", "success")
+            # If user is found, check if they are already assigned to the project
+            if User_Projects.is_user_assigned(user_id, project_id):
+                flash(f"{user.first_name} {user.last_name} is already assigned to this project.", "error")
             else:
-                flash(f"Project with ID {project_id} not found.", "error")
+                # If not assigned, proceed to assign them
+                project = Projects.get_project_by_id(project_id)
+                if project:
+                    User_Projects.assign_user(user_id, project_id)  # Corrected usage
+                    flash(f"{user.first_name} {user.last_name} assigned to {project.project_name}.", "success")
+                else:
+                    flash(f"Project with ID {project_id} not found.", "error")
         else:
             flash(f"User with ID {user_id} not found.", "error")
 
-        return redirect(f"/view_project_by_id/{project_id}")
+        return redirect(f"/view_users_per_project/{project_id}")
 
     else:
         # Retrieve all users from the database
         users = User.get_all()
         return render_template("/projects/add_user_to_project.html", users=users, project_id=project_id)
 
+
 @app.route('/view_users_per_project/<int:project_id>', methods=["GET"])
 def view_users_per_project(project_id):
     users_data = User_Projects.view_all_users_per_project(project_id)
     project = Projects.get_project_by_id(project_id)
-    print("Data:", users_data)
     
     users = []
     for user_data in users_data:
@@ -97,7 +106,6 @@ def status_page(project_id):
 
 @app.route('/project/status/<int:project_id>')
 def project_status(project_id):
-    # Example function to get project status data
     equipment_data = Equipment.get_equipment_by_project(project_id)
 
     total_methods = 0
@@ -120,12 +128,15 @@ def project_status(project_id):
                         repair_info = repair_info[0] if isinstance(repair_info, list) and len(repair_info) > 0 else repair_info
                         method['repair_number'] = repair_info.get('repair_number', 'N/A')
                         method['file_path'] = repair_info.get('file_path', '')
+                        document_url = None
+                        if method['file_path']:
+                            document_url = url_for('uploaded_file', filename=os.path.basename(method['file_path']))
                         repairs_info.append({
                             'component': component.name,
                             'equipment': equipment.number,
                             'status': method['status'],
                             'description': repair_info.get('description', 'No description available'),
-                            'document': url_for('uploaded_file', filename=os.path.basename(method['file_path'])),
+                            'document': document_url,
                             'repair_number': repair_info.get('repair_number', 'N/A')
                         })
 
@@ -219,5 +230,21 @@ def export_data(project_id):
 
     return send_file(output, download_name='project_data.xlsx', as_attachment=True)
 
+@app.route('/delete_project/<int:project_id>')
+def remove_project(project_id):
+    # Retrieve project details before deletion
+    project = Projects.get_project_by_id(project_id)
+    
+    if not project:
+        flash(f'Project with ID {project_id} not found', 'danger')
+        return redirect(url_for('show_all_projects'))
+
+
+    if Projects.remove_project(project_id):
+        flash(f'Project "{project.project_name}" deleted successfully', 'success')
+    else:
+        flash(f'Failed to delete project "{project.project_name}"', 'danger')
+    
+    return redirect(url_for('show_all_projects'))
 
 
