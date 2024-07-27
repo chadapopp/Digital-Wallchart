@@ -1,8 +1,9 @@
 {% extends 'index.html' %}
 {% block content %}
+
 <div class="container">
     <div class="row">
-        <div class="col-12 text-center">
+        <div class="col-12 text-center text-white mb-5 mt-5">
             <h1>Project Status</h1>
         </div>
     </div>
@@ -25,6 +26,7 @@
                             <th>Equipment Number</th>
                             <th>Component</th>
                             <th>Status</th>
+                            <th>Repair Number</th>
                             <th>Description</th>
                             <th>Attachments</th>
                         </tr>
@@ -93,22 +95,24 @@
             nameCell.textContent = component.component;
             const statusCell = document.createElement('td');
             statusCell.textContent = component.status;
+            const repairNumberCell = document.createElement('td');
+            repairNumberCell.textContent = component.repair_number;
             const descriptionCell = document.createElement('td');
             descriptionCell.textContent = component.description;
             const documentCell = document.createElement('td');
             if (component.document) {
                 const documentLink = document.createElement('a');
-                documentLink.href = '/' + component.document;  // Use the relative path
+                documentLink.href = `${component.document}`;  
                 documentLink.target = '_blank';
                 documentLink.textContent = 'View Document';
                 documentCell.appendChild(documentLink);
             } else {
                 documentCell.textContent = 'No document';
             }
-
             row.appendChild(numberCell);
             row.appendChild(nameCell);
             row.appendChild(statusCell);
+            row.appendChild(repairNumberCell);
             row.appendChild(descriptionCell);
             row.appendChild(documentCell);
             tbody.appendChild(row);
@@ -122,13 +126,15 @@
         const chart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Completed', 'Repair Required', 'Pending'],
+                labels: ['Complete', 'Repair Required', 'Pending'],
+                
                 datasets: [{
                     label: 'Project Status',
-                    data: [data.completed, data.repair, data.pending],
+                    data: [data.complete, data.repair, data.pending],
                     backgroundColor: ['#28a745', '#dc3545', '#ffc107'],
                     borderColor: ['#28a745', '#dc3545', '#ffc107'],
-                    borderWidth: 1
+                    borderWidth: 1,
+                    
                 }]
             },
             options: {
@@ -136,11 +142,10 @@
                 plugins: {
                     legend: {
                         position: 'top',
+                        labels: {
+                            color: 'white'  // Set legend text color to white
+                        }
                     },
-                    title: {
-                        display: true,
-                        text: 'Project Status'
-                    }
                 },
                 onClick: async function(evt, item) {
                     if (item.length > 0 && item[0].index === 1) {
