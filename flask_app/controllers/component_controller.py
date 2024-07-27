@@ -10,14 +10,11 @@ from flask_app.models.user_projects import  User_Projects
 from flask_app.models.component_method import Component_Methods
 from datetime import datetime
 
-
-
 @app.route('/add_components/<int:project_id>/<int:equipment_id>', methods=['GET', 'POST'])
 def add_components(project_id, equipment_id):
     if request.method == 'POST':
-        component_names_str = request.form.get('name', '')
-        component_names = [name.strip() for name in component_names_str.split(',') if name.strip()]
-
+        component_names = request.form.getlist('components')
+        
         for name in component_names:
             data = {
                 'equipment_id': equipment_id,
@@ -26,9 +23,12 @@ def add_components(project_id, equipment_id):
             }
             Components.add_component(data)
 
-        return redirect(url_for('wallchart', project_id=project_id))
+        return redirect(url_for('add_methods', project_id=project_id, equipment_id=equipment_id))
 
-    return render_template('components/add_components.html', project_id=project_id, equipment_id=equipment_id)
+    components_list = ["External", "Shell", "Nozzles", "Shell Cover", "Bonnet","Inlet Channel", "Outlet Channel", "Channel", "Inlet Channel Cover", "Outlet Channel Cover", "Channel Cover", "Bundle", "Floating Head/Split Rings", "Header Boxes", "Tube Sheets", "Tubesheets", "Tubes", "Heads", "Primary Cyclones", "Secondary Cyclones", "Airgrid", "Internal Components", "Refractory", "Radiant Mechanical", "Radiant Refractory", "Convection Mechanical", "Convection Refractory", "Stack", "Closure", "Hydro", "Report"]
+    equipment_info = Equipment.get_equipment_by_id(equipment_id)[0]  
+    return render_template('components/add_components.html', project_id=project_id, equipment_id=equipment_id, components_list=components_list, equipment_info = equipment_info)
+
 
 @app.route('/manage_components/<int:project_id>/<int:equipment_id>', methods=['GET', 'POST'])
 def manage_components(project_id, equipment_id):
@@ -47,15 +47,13 @@ def manage_components(project_id, equipment_id):
             Components.add_component(data)
 
         flash('Components added successfully')
-        return redirect(url_for('manage_components', project_id=project_id, equipment_id=equipment_id))
+        return redirect(url_for('add_methods', project_id=project_id, equipment_id=equipment_id))
         
 
     components = Components.get_components_by_equipment_id(equipment_id)
     equipment = Equipment.get_equipment_by_id(equipment_id)[0]  # Assuming the query returns a list
-    predetermined_components = ["External", "Shell", "Shell Cover", "Channel", "Channel Cover", "Bundle", "Floating Head/Split Rings", "Heads", "Internal Components", "Radiant Mechanical", "Radiant Refractory", "Convection Mechanical", "Convection Refractory", "Stack", "Closure", "Report"]  # List of predetermined components
+    predetermined_components = ["External", "Shell", "Nozzles", "Shell Cover", "Bonnet","Inlet Channel", "Outlet Channel", "Channel", "Inlet Channel Cover", "Outlet Channel Cover", "Channel Cover", "Bundle", "Floating Head/Split Rings", "Header Boxes", "Tube Sheets", "Tubesheets", "Tubes", "Heads", "Primary Cyclones", "Secondary Cyclones", "Airgrid", "Internal Components", "Refractory", "Radiant Mechanical", "Radiant Refractory", "Convection Mechanical", "Convection Refractory", "Stack", "Closure", "Hydro", "Report"]  # List of predetermined components
     return render_template('components/manage_components.html', components=components, project_id=project_id, equipment_id=equipment_id, predetermined_components=predetermined_components, equipment=equipment)
-
-
 
 # Initial page load route
 @app.route('/wallchart/<int:project_id>')
@@ -65,6 +63,7 @@ def wallchart(project_id):
     equipment_data = Equipment.get_equipment_by_project(project_id)
     components_by_equipment = {e.id: Components.get_components_by_equipment_id(e.id) for e in equipment_data}
     return render_template('wallchart/wallchart.html', equipment_types=equipment_types, equipment_data=equipment_data, project=project, components_by_equipment=components_by_equipment)
+
 
 @app.route('/view_wallchart/<int:project_id>')
 def view_wallchart(project_id):
@@ -80,7 +79,7 @@ def view_wallchart(project_id):
     project = Projects.get_project_by_id(project_id)
 
     components_by_equipment = {}
-    all_component_names = []
+    all_component_names = ["External", "Shell", "Nozzles", "Shell Cover", "Bonnet","Inlet Channel", "Outlet Channel", "Channel", "Inlet Channel Cover", "Outlet Channel Cover", "Channel Cover", "Bundle", "Floating Head/Split Rings", "Header Boxes", "Tube Sheets", "Tubesheets", "Tubes", "Heads", "Primary Cyclones", "Secondary Cyclones", "Airgrid", "Internal Components", "Refractory", "Radiant Mechanical", "Radiant Refractory", "Convection Mechanical", "Convection Refractory", "Stack", "Closure", "Hydro", "Report"]
 
     for equipment in equipment_data:
         components = Components.get_components_by_equipment_id(equipment.id)
@@ -114,23 +113,6 @@ def view_wallchart(project_id):
                             equipment_types=equipment_types, 
                             users=users, current_user=current_user, current_date=current_date)
 
-
-
-@app.route('/update_component/<int:component_id>', methods=['POST'])
-def update_status(component_id):
-    component = Components.get_component_by_id(component_id)
-    if request.method == 'POST':
-        status = request.form['status']
-        data = {
-            'status': status,
-            'id': component_id
-        }
-        Components.edit_component_status(component_id, data)
-        flash('Component status updated successfully')
-        
-        # Redirect to the edit_component page with component_id
-        return redirect(url_for('view_wallchart', project_id=request.args.get('project_id')))
-    return render_template('components/update_component.html', component = component) 
 
 @app.route('/add_method_to_components/<int:project_id>', methods=['GET', 'POST'])
 def add_method_to_components(project_id):
@@ -216,3 +198,4 @@ def delete_component(component_id):
     Components.delete_component(component_id)
     flash('Component deleted successfully')
     return redirect(url_for('manage_components', project_id=component.project_id, equipment_id=component.equipment_id))
+
