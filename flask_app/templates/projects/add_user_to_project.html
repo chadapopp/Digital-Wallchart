@@ -2,11 +2,11 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Add User to Project</h2>
-    <form method="post" action="/add_user_to_project/{{project_id}}">
+    <h2 class="text-white">Add User to Project</h2>
+    <form method="post" style="background-color: transparent;" action="/add_user_to_project/{{project_id}}">
         <input type="hidden" name="project_id" value="{{ project_id }}">
         <div class="mb-3">
-            <label for="user_id" class="form-label">Select User</label>
+            <label for="user_id" class="form-label text-white">Select User</label>
             <select class="form-select" id="user_id" name="user_id">
                 <option>Select User</option>
                 {% for user in users %}
