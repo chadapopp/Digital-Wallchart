@@ -1,28 +1,28 @@
 
-<div id="loadingScreen" class="loading-screen" style="display:none;">
-    <div class="spinner"></div>
-</div>
 <div class="table-responsive">
     {% for equipment in equipment_data %}
-    <table class="table table-striped rounded-2 mb-0" id="equipment_table">
-        <p class="bg-white mt-2 mb-0 fw-bold p-2">Scope: <br> {{equipment.scope}}</p>
+    <table class="table table-striped rounded-2 mb-0 table-bordered" id="equipment_table">
+        <p class="bg-white mt-2 mb-0 fw-bold p-2">
+            Scope: <br> {{equipment.scope}}
+        </p>
         <thead>
             <tr>
                 <th>Equipment</th>
                 {% for component_name in all_component_names %}
-                    <th>{{ component_name }}</th>
+                    {% if component_name in components_by_equipment[equipment.id] %}
+                        <th>{{ component_name }}</th>
+                    {% endif %}
                 {% endfor %}
-            
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td><span class="fw-bold">{{equipment.number}}</span><br> {{ equipment.name }}</td>
+                <td><span class="fw-bold"><a href="/edit_equipment/{{project.id}}/{{equipment.id}}" style="color: black;">{{equipment.number}}</a></span><br> {{ equipment.name }}</td>
                 
                 {% for component_name in all_component_names %}
-                    <td>
-                        {% if component_name in components_by_equipment[equipment.id] %}
-                            {% set component = components_by_equipment[equipment.id][component_name] %}
+                    {% if component_name in components_by_equipment[equipment.id] %}
+                        {% set component = components_by_equipment[equipment.id][component_name] %}
+                        <td>
                             <div id="component-{{ component.id }}" class="component-methods">
                                 {% for method in component.methods %}
                                     <span class="badge 
@@ -36,19 +36,30 @@
                                             badge-secondary
                                         {% endif %}
                                         text-black d-flex">
-                                        <a href="#" class="text-black d-flex" data-bs-toggle="modal" data-bs-target="#methodModal" data-method-id="{{ method.id }}" data-component-id="{{ component.id }}" data-method-status="{{ method.status }}" data-equipment-id="{{ equipment.id }}">
+                                        {% if session.user_role == 'read_only' %}
                                             {{ method.method_type }}{% if method.updated_by %} - {{ method.updated_by }}{% endif %}
                                             {% if method.updated_at != method.created_at %}
                                                 {{ method.updated_at.strftime('%m/%d/%y') }}
                                             {% endif %}
-                                        </a>
+                                        {% else %}
+                                            <a href="#" class="text-black d-flex" data-bs-toggle="modal" data-bs-target="#methodModal" data-method-id="{{ method.id }}" data-component-id="{{ component.id }}" data-method-status="{{ method.status }}" data-equipment-id="{{ equipment.id }}">
+                                                {{ method.method_type }}{% if method.updated_by %} - {{ method.updated_by }}{% endif %}
+                                                {% if method.updated_at != method.created_at %}
+                                                    {{ method.updated_at.strftime('%m/%d/%y') }}
+                                                {% endif %}
+                                            </a>
+                                        {% endif %}
                                     </span>
                                     {% if method.repairs %}
                                         <div class="repair-details">
                                             {% set displayed_repairs = [] %}
                                             {% for repair in method.repairs %}
                                                 {% if repair.repair_number not in displayed_repairs %}
-                                                    <a href="#" class="badge text-black {% if repair.repair_status in ['Complete', 'Rejected', 'Deferred'] %}badge-success{% else %}badge-danger{% endif %}" data-bs-toggle="modal" data-bs-target="#repairModal" data-repair-id="{{ repair.id }}" data-component-id="{{ component.id }}" data-equipment-id="{{ equipment.id }}">{{ repair.repair_number }}</a>
+                                                    {% if repair.file_path %}
+                                                        <a href="{{ url_for('uploaded_file', filename=repair.file_path|basename) }}" class="badge text-black {% if repair.repair_status in ['Complete', 'Rejected', 'Deferred'] %}badge-success{% else %}badge-danger{% endif %}" data-bs-toggle="modal" data-bs-target="#repairModal" data-repair-id="{{ repair.id }}" data-component-id="{{ component.id }}" data-equipment-id="{{ equipment.id }}">{{ repair.repair_number }}</a>
+                                                    {% else %}
+                                                        <span class="badge text-black {% if repair.repair_status in ['Complete', 'Rejected', 'Deferred'] %}badge-success{% else %}badge-danger{% endif %}">{{ repair.repair_number }}</span>
+                                                    {% endif %}
                                                     {% set displayed_repairs = displayed_repairs + [repair.repair_number] %}
                                                 {% endif %}
                                             {% endfor %}
@@ -56,25 +67,25 @@
                                     {% endif %}
                                 {% endfor %}
                             </div>
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
+                        </td>
+                    {% endif %}
                 {% endfor %}
             </tr>
-            {% endfor %}
         </tbody>
     </table>
-</div>
+{% endfor %}
+
+{% if session['user_role'] == 'admin' %}
 <a href="/add_single_equipment/{{ project.id }}" class="btn btn-primary">Add Equipment</a>
-<a href="/export_data/{{ project.id }}" class="btn btn-secondary">Export Data to Excel</a>
+{% endif %}
+
 
 <!-- Method Modal -->
 <div class="modal fade" id="methodModal" tabindex="-1" aria-labelledby="methodModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="methodModalLabel">Update Method Status</h5>
+                <h5 class="modal-title" id="methodModalLabel">Update Status</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -159,4 +170,3 @@
         </div>
     </div>
 </div>
-
