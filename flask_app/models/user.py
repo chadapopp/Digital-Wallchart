@@ -10,13 +10,14 @@ class User:
         self.email = user_data["email"]
         self.password = user_data["password"]
         self.role = user_data["role"]
+        self.user_name =   user_data["user_name"]
         self.created_at = user_data["created_at"]
         self.updated_at = user_data["updated_at"]
         
     
     @classmethod
     def create_user(cls, data):
-        query = """INSERT INTO users (first_name, last_name, email, role, password) VALUES (%(first_name)s, %(last_name)s,%(email)s, %(role)s, %(password)s)"""
+        query = """INSERT INTO users (first_name, last_name, email, role, user_name, password) VALUES (%(first_name)s, %(last_name)s,%(email)s, %(role)s, %(user_name)s, %(password)s)"""
         result = connectToMySQL(cls.DB).query_db(query, data)
         return result
     
@@ -35,6 +36,15 @@ class User:
         data = {'email': email}
         result = connectToMySQL(cls.DB).query_db(query, data)
         if len(result) < 1:
+            return False
+        return cls(result[0])
+    
+    @classmethod
+    def get_by_username(cls, user_name):
+        query = "SELECT * FROM users WHERE user_name=%(user_name)s"
+        data = {'user_name': user_name}
+        result = connectToMySQL(cls.DB).query_db(query, data)
+        if len(result) <1:
             return False
         return cls(result[0])
     
