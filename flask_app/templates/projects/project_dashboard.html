@@ -7,10 +7,10 @@
         <div class="welcome-buttons">
             <h3><a href="/wallchart/{{project.id}}">Wallchart</a></h3>
         </div>
+        {% if session['user_role'] == 'admin' %}
         <div class="welcome-buttons">
             <h3><a href="/view_equipment_per_project/{{project.id}}">View Equipment</a></h3>
         </div>
-        {% if session['user_role'] == 'admin' %}
         <div class="welcome-buttons">
             <h3><a href="/upload_all/{{ project.id }}">Upload Equipment and Components</a></h3>
         </div>
