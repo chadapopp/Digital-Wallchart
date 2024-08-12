@@ -255,3 +255,30 @@ form {
     width: 10%;
 }
 
+.table-responsive {
+    overflow-x: auto;
+}
+
+.sticky-col {
+    position: -webkit-sticky;
+    position: sticky;
+    left: 0;
+    background-color: #fff; /* Adjust as necessary */
+    z-index: 1;
+    box-shadow: 1px 0 0 #ddd; /* Optional to add a slight shadow */
+}
+
+.sticky-col a {
+    color: black;
+}
+
+.sticky-tabs {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding-top: 10px; /* Adjust padding as needed */
+    padding-bottom: 10px; /* Adjust padding as needed */
+    margin-bottom: 10px; /* Add margin to create space below the tabs */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Optional: Add a shadow for better visibility */
+}
