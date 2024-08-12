@@ -13,9 +13,13 @@
             {% include '_back_button.html' %}
             <a href="/project/status_page/{{project.id}}" class="btn btn-success mb-5 ms-1">View Status</a>
             <a href="/repairs/view_all_repairs/{{project.id}}" class="btn btn-warning mb-5 ms-1">View Repairs</a>
+            <a href="/view_project_by_id/{{project.id}}" class="btn btn-secondary mb-5 ms-1">Project Dashboard</a>
         </div>
         <div>
             <a href="/export_data/{{ project.id }}" class="btn btn-secondary mb-5">Export Data</a>
+            {% if session['user_role'] == 'admin' %}
+                <a href="/add_single_equipment/{{ project.id }}" class="btn btn-secondary mb-5">Add Equipment</a>
+            {% endif %}
         </div>
     </div>
     <div class="tabs text-black">
