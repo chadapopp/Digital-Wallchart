@@ -38,7 +38,7 @@ def show_all_projects():
         projects = Projects.get_all()
     else:
         projects = Projects.get_projects_by_user_id(user_id)
-
+    print("Role:" , user_role)
     return render_template("/projects/all_projects.html", projects=projects, user_role=user_role)
 
 
