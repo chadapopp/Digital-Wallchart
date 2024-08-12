@@ -2,12 +2,12 @@
 <div class="table-responsive">
     {% for equipment in equipment_data %}
     <table class="table table-striped rounded-2 mb-0 table-bordered" id="equipment_table">
-        <p class="bg-white mt-2 mb-0 fw-bold p-2">
+        <p class="bg-white mt-2 mb-0 fw-bold p-2 sticky-col">
             Scope: <br> {{equipment.scope}}
         </p>
         <thead>
             <tr>
-                <th>Equipment</th>
+                <th class="sticky-col">Equipment</th>
                 {% for component_name in all_component_names %}
                     {% if component_name in components_by_equipment[equipment.id] %}
                         <th>{{ component_name }}</th>
@@ -17,7 +17,7 @@
         </thead>
         <tbody>
             <tr>
-                <td><span class="fw-bold"><a href="/edit_equipment/{{project.id}}/{{equipment.id}}" style="color: black;">{{equipment.number}}</a></span><br> {{ equipment.name }}</td>
+                <td class="sticky-col"><span class="fw-bold"><a href="/edit_equipment/{{project.id}}/{{equipment.id}}" style="color: black;">{{equipment.number}}</a></span><br> {{ equipment.name }}</td>
                 
                 {% for component_name in all_component_names %}
                     {% if component_name in components_by_equipment[equipment.id] %}
@@ -74,10 +74,6 @@
         </tbody>
     </table>
 {% endfor %}
-
-{% if session['user_role'] == 'admin' %}
-<a href="/add_single_equipment/{{ project.id }}" class="btn btn-primary">Add Equipment</a>
-{% endif %}
 
 
 <!-- Method Modal -->
