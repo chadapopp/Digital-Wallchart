@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container mt-5 p-5">
-    {% if user_role.role == 'admin' %}
+    {% if user_role == 'admin' %}
     <a href="/create_project" class="btn btn-primary mb-5">Add New Project</a>
     {% endif %}
     <table class="table table-striped table-hover">
