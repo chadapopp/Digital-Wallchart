@@ -6,8 +6,8 @@
         <div class="col-md-2">
             <!-- Buttons Section -->
             {% if user_role.role == 'admin' %}
-            <div class="d-flex flex-column button-container">
-                {% include '_back_button.html' %}
+            <div class="d-flex flex-column button-container mt-5">
+                <a href="/view_project_by_id/{{project.id}}" class="btn btn-secondary mb-2 ms-1">Project Dashboard</a>
                 <a href="/manage_components/{{ project.id }}/{{ equipment[0].id }}" class="btn btn-success mb-2">Manage Components</a>
                 <a href="/add_methods/{{ project.id }}/{{ equipment[0].id }}" class="btn btn-warning mb-2">Add Tasks</a>
                 <a href="/delete_equipment/{{ project.id }}/{{ equipment[0].id }}" class="btn btn-danger mb-2" onclick="confirmRemoval(event)">Remove Equipment</a>
