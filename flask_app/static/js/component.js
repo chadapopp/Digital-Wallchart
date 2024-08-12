@@ -51,8 +51,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Add custom option
         var customOption = document.createElement('option');
-        customOption.value = 'custom';
-        customOption.textContent = 'Custom';
+        customOption.value = 'other';
+        customOption.textContent = 'Other';
         select.appendChild(customOption);
 
         newField.appendChild(select);
@@ -61,14 +61,14 @@ document.addEventListener('DOMContentLoaded', function () {
         customInput.type = 'text';
         customInput.className = 'form-control mb-2 d-none';
         customInput.name = 'custom_components[]';
-        customInput.placeholder = 'Enter custom component name';
+        customInput.placeholder = 'Enter component name';
         newField.appendChild(customInput);
 
         document.getElementById('component-fields').appendChild(newField);
 
         // Show custom input field if 'Custom' is selected
         select.addEventListener('change', function () {
-            if (this.value === 'custom') {
+            if (this.value === 'other') {
                 customInput.classList.remove('d-none');
                 customInput.required = true;
             } else {
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('select[name="components[]"]').forEach(function (select) {
         select.addEventListener('change', function () {
             var customInput = this.nextElementSibling;
-            if (this.value === 'custom') {
+            if (this.value === 'other') {
                 customInput.classList.remove('d-none');
                 customInput.required = true;
             } else {
