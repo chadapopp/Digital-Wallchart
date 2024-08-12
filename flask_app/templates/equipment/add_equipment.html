@@ -10,12 +10,12 @@
                     <form id="uploadForm" action="/upload_all/{{ project_id }}" method="post" style="background-color: transparent;" enctype="multipart/form-data">
                         <h3 class="mt-4 text-center">Import from Excel File</h3>
                         <div class="mb-3">
-                            <label for="file" class="form-label">Upload Excel File:</label>
+                            <label for="file" class="form-label">Select File:</label>
                             <input type="file" id="file" name="file" accept=".xlsx, .xls" class="form-control">
                         </div>
                         <input type="hidden" name="user_id" value="{{ user_id }}">
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Add Equipment</button>
+                            <button type="submit" class="btn btn-primary">Upload</button>
                         </div>
                     </form>
                 </div>
