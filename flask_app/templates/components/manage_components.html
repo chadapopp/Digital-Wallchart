@@ -28,14 +28,15 @@
                         {% for component in predetermined_components %}
                             <option value="{{ component }}">{{ component }}</option>
                         {% endfor %}
-                        <option value="custom">Custom</option>
+                        <option value="other">Other</option>
                     </select>
-                    <input type="text" class="form-control mb-2 d-none custom-input" name="custom_components[]" placeholder="Enter custom component name">
+                    <input type="text" class="form-control mb-2 d-none custom-input" name="custom_components[]" placeholder="Enter component name">
                 </div>
             </div>
-            <button type="button" class="btn btn-secondary mt-3" id="add-component-field">Add Another Component</button>
+            <button type="button" class="btn btn-secondary mt-3 me-3" id="add-component-field">Add Another Component</button>
+            <button type="submit" class="btn btn-primary mt-3 ">Save Components</button>
             <a href="/add_methods/{{ project_id }}/{{ equipment_id }}" class="btn btn-warning mt-3">Add Tasks</a>
-            <button type="submit" class="btn btn-primary mt-3 d-block mx-auto">Save Components</button>
+            
         </form>
     </div>
 </div>
