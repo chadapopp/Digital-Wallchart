@@ -86,9 +86,13 @@ def view_wallchart(project_id):
         component_dict = {component.name: component for component in components}
         components_by_equipment[equipment.id] = component_dict
 
+        # Identify custom components and insert them before "Closure"
+        closure_index = all_component_names.index("Closure")
         for component in components:
             if component.name not in all_component_names:
-                all_component_names.append(component.name)
+                all_component_names.insert(closure_index, component.name)
+                closure_index += 1  # Adjust the index as we insert new components
+
             component_methods = Component_Methods.get_methods_by_component_id(component.id)
             
             for method in component_methods:
@@ -100,8 +104,6 @@ def view_wallchart(project_id):
                     method['updated_at'] = datetime.strptime(method['updated_at'], '%Y-%m-%d %H:%M:%S') if isinstance(method['updated_at'], str) else method['updated_at']
 
             component.methods = [{'id': method['id'], 'method_type': method['method_type'], 'status': method['status'], 'updated_by': method.get('updated_by', ''), 'updated_at': method.get('updated_at', None), 'created_at': method['created_at'], 'repairs': method.get('repairs', [])} for method in component_methods]
-
-
     
     equipment_types = Equipment.get_distinct_equipment_types(project_id)
     
