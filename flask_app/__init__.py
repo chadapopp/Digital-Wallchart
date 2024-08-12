@@ -11,8 +11,12 @@ app.config["UPLOAD_FOLDER"] = os.path.join(app.instance_path, "uploads")
 # Define the static URL path
 app.static_url_path = '/static'
 
+@app.route('/static/js/<path:filename>')
+def serve_static_js(filename):
+    return send_from_directory(os.path.join(app.root_path, 'static', 'js'), filename)
 
-@app.route('/uploads/<filename>')
+
+@app.route('/uploads/path:<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
