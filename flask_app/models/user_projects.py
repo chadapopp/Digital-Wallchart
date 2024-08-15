@@ -50,7 +50,7 @@ class User_Projects:
             "user_id": user_id,
             "project_id": project_id
         }
-        return connectToMySQL("digital_wallchart_schema").query_db(query, data)
+        return connectToMySQL("digitalwallchart").query_db(query, data)
 
 
 
