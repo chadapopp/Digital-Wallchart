@@ -13,6 +13,7 @@ class MySQLConnection:
                                     autocommit = False)
         # establish the connection to the database
         self.connection = connection
+        print(f"Connected to database {db} on{connection.host}")
     # the method to query the database
     def query_db(self, query:str, data:dict=None):
         with self.connection.cursor() as cursor:
