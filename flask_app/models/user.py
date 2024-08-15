@@ -2,7 +2,7 @@ from flask_app.config.mysqlconnection import connectToMySQL
 
 
 class User:
-    DB = "digital_wallchart"
+    DB = "digitalwallchart"
     def __init__(self, user_data):
         self.id = user_data["id"]
         self.first_name = user_data["first_name"]
