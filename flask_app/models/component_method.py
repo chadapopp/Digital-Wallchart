@@ -3,7 +3,7 @@ from flask_app.models.method import Methods
 from flask_app.models.repairs import Repairs
 
 class Component_Methods:
-    DB = "digital_wallchart_schema"
+    DB = "digitalwallchart"
     def __init__(self, cm_data):
         self.id = cm_data["id"]
         self.method_id = cm_data["method_id"]
