@@ -13,8 +13,19 @@ def login_form():
 # Handle login form submission
 @app.route('/login', methods=['POST'])
 def login():
-    user = User.get_by_username(request.form.get('user_name'))
-    if user:
+    username = request.form.get('user_name')
+    password = request.form.get('password')
+
+    # Check if both username and password are provided
+    if not username or not password:
+        flash('Username and password are required', 'error')
+        return redirect('/')
+    
+    # Retrieve the user by username
+    user = User.get_by_username(username)
+
+    # If user exists, check the password
+    if user and  password:
         session['user_id'] = user.id
         session['first_name'] = user.first_name
         session['last_name'] = user.last_name
@@ -22,7 +33,7 @@ def login():
         session['logged_in'] = True
         return redirect('/homepage')
     else:
-        flash('Invalid email or password', 'error')
+        flash('Invalid username or password', 'error')
         return redirect('/')
 
 # Display user's homepage
