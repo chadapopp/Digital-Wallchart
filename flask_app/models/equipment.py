@@ -2,7 +2,7 @@ from flask_app.config.mysqlconnection import connectToMySQL
 import pandas as pd 
 
 class Equipment:
-    DB = "digital_wallchart_schema"
+    DB = "digital_wallchart"
     def __init__(self, equip_data):
         self.id = equip_data["id"]
         self.project_id = equip_data["project_id"]
