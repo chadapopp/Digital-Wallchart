@@ -1,7 +1,7 @@
 from flask_app.config.mysqlconnection import connectToMySQL
 
 class Repairs:
-    DB = "digital_wallchart_schema"
+    DB = "digital_wallchart"
     def __init__(self, repair_data):
         self.id = repair_data["id"]
         self.method_id = repair_data["method_id"]
