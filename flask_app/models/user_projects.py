@@ -40,7 +40,7 @@ class User_Projects:
             "user_id": user_id,
             "project_id": project_id
         }
-        result = connectToMySQL("digital_wallchart_schema").query_db(query, data)
+        result = connectToMySQL("digitalwallchart").query_db(query, data)
         return result[0]['count'] > 0
 
     @staticmethod
