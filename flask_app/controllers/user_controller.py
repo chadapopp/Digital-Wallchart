@@ -100,3 +100,13 @@ def remove_user_from_project(project_id, user_id):
         flash(f"User with ID {user_id} not found.", "error")
 
     return redirect(f"/view_users_per_project/{project_id}")
+
+@app.route('/delete_user/<int:user_id>', methods=[ "GET", "POST"])
+def delete_user(user_id):
+    user = User.get_user_by_id(user_id)
+    
+    if user:
+        User.delete_user(user_id)
+        flash(f"{user.first_name} {user.last_name} deleted successfully.", "success")
+    
+    return redirect('/show_all_users')
