@@ -76,3 +76,22 @@ class User:
         query = "UPDATE users SET first_name=%(first_name)s, last_name=%(last_name)s, email=%(email)s, role=%(role)s, password=%(password)s WHERE id=%(id)s"
         result = connectToMySQL(cls.DB).query_db(query, data)
         return result
+
+    @classmethod
+    def delete_user(cls, user_id):
+        try:
+            # Step 1: Delete all related records in user_projects
+            delete_projects_query = "DELETE FROM user_projects WHERE user_id = %(user_id)s"
+            data = {'user_id': user_id}
+            connectToMySQL(cls.DB).query_db(delete_projects_query, data)
+
+            # Step 2: Delete the user from the users table
+            delete_user_query = "DELETE FROM users WHERE id = %(user_id)s"
+            result = connectToMySQL(cls.DB).query_db(delete_user_query, data)
+            
+            # Check if the deletion was successful by examining the result
+            return result is not None
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+            return False
+
