@@ -25,7 +25,7 @@ def create_user():
         # Create user
         User.create_user(data)
         
-        return redirect("/homepage")
+        return redirect("/show_all_users")
     else:
         # Render the create user page
         return render_template("/users/create_user.html")
