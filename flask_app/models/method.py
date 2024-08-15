@@ -1,7 +1,7 @@
 from flask_app.config.mysqlconnection import connectToMySQL
 
 class Methods:
-    DB = "digital_wallchart"
+    DB = "digitalwallchart"
 
     def __init__(self, method_data):
         self.id = method_data["id"]
