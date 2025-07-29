@@ -200,4 +200,3 @@ def delete_component(component_id):
     Components.delete_component(component_id)
     flash('Component deleted successfully')
     return redirect(url_for('manage_components', project_id=component.project_id, equipment_id=component.equipment_id))
-
