@@ -247,4 +247,3 @@ def remove_project(project_id):
     
     return redirect(url_for('show_all_projects'))
 
-
