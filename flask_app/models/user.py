@@ -2,7 +2,7 @@ from flask_app.config.mysqlconnection import connectToMySQL
 
 
 class User:
-    DB = "digitalwallchart"
+    DB = "digital_wallchart_schema"
     def __init__(self, user_data):
         self.id = user_data["id"]
         self.first_name = user_data["first_name"]
@@ -76,7 +76,7 @@ class User:
         query = "UPDATE users SET first_name=%(first_name)s, last_name=%(last_name)s, email=%(email)s, role=%(role)s, password=%(password)s WHERE id=%(id)s"
         result = connectToMySQL(cls.DB).query_db(query, data)
         return result
-
+    
     @classmethod
     def delete_user(cls, user_id):
         try:
