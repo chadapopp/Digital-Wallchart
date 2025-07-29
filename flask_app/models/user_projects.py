@@ -2,7 +2,7 @@ from flask_app.config.mysqlconnection import connectToMySQL
 from flask_app.models.user import User
 
 class User_Projects:
-    DB = "digitalwallchart"
+    DB = "digital_wallchart_schema"
     def __init__(self, user_projects_data):
         self.id = user_projects_data["id"]
         self.user_id = user_projects_data["user_id"]
@@ -40,7 +40,7 @@ class User_Projects:
             "user_id": user_id,
             "project_id": project_id
         }
-        result = connectToMySQL("digitalwallchart").query_db(query, data)
+        result = connectToMySQL("digital_wallchart_schema").query_db(query, data)
         return result[0]['count'] > 0
 
     @staticmethod
@@ -50,7 +50,7 @@ class User_Projects:
             "user_id": user_id,
             "project_id": project_id
         }
-        return connectToMySQL("digitalwallchart").query_db(query, data)
+        return connectToMySQL("digital_wallchart_schema").query_db(query, data)
 
 
 
