@@ -3,7 +3,7 @@ import pandas as pd
 import re
 
 class Equipment:
-    DB = "digital_wallchart_schema"
+    DB = "digitalwallchart"
     def __init__(self, equip_data):
         self.id = equip_data["id"]
         self.project_id = equip_data["project_id"]
