@@ -5,7 +5,7 @@ from flask_app.models.equipment import Equipment
 import pandas as pd 
 
 class Components:
-    DB = "digital_wallchart_schema"
+    DB = "digitalwallchart"
     
     def __init__(self, component_data):
         self.id = component_data["id"]
