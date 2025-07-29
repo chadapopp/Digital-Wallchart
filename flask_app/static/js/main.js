@@ -27,7 +27,8 @@ $(document).ready(function() {
             success: function(response) {
                 console.log('Equipment data loaded successfully'); // Logging
                 $('#equipmentTabContent').html(response);
-                hideLoadingScreen(); // Hide loading screen once data is loaded
+                hideLoadingScreen();
+                bindSearchFilter(); // Hide loading screen once data is loaded
             },
             error: function(xhr, status, error) {
                 console.error('Error loading equipment data:', error);
@@ -42,6 +43,7 @@ $(document).ready(function() {
         $('#currentTab').val(currentTab);
     }
     loadEquipmentData(currentTab);
+    bindSearchFilter();
 
     $(document).on('click', '.equipment-type-tab', function(e) {
         e.preventDefault();
@@ -198,3 +200,27 @@ $(document).ready(function() {
     });
 });
 
+function bindSearchFilter() {
+    const searchInput = document.getElementById("searchInput");
+    if (!searchInput) return;
+
+    searchInput.addEventListener("input", function () {
+        const search = this.value.toLowerCase();
+        let anyVisible = false;
+        const entries = Array.from(document.querySelectorAll(".equipment-entry"));
+
+        entries.forEach(entry => {
+            const name = entry.dataset.name?.toLowerCase() || "";
+            const number = entry.dataset.number?.toLowerCase() || "";
+            const match = name.includes(search) || number.includes(search);
+
+            entry.style.display = match ? "" : "none";
+            if (match) anyVisible = true;
+        });
+
+        const noResults = document.getElementById("noResultsMessage");
+        if (noResults) {
+            noResults.style.display = anyVisible ? "none" : "block";
+        }
+    });
+}
