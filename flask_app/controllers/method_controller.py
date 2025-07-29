@@ -151,4 +151,3 @@ def get_component_status():
     return jsonify(all_methods)
 
 
-
