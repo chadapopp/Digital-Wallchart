@@ -1,7 +1,7 @@
 from flask_app.config.mysqlconnection import connectToMySQL
 
 class Projects:
-    DB = "digital_wallchart_schema"
+    DB = "digitalwallchart"
     def __init__(self, project_data):
         self.id = project_data["id"]
         self.user_id = project_data["user_id"]
