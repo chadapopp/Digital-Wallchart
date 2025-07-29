@@ -6,14 +6,33 @@
     <div class="row justify-content-center"> 
         <div class="col">
             <a href="/add_single_equipment/{{ project.id }}" class="btn btn-secondary mb-5">Add Equipment</a>
-            <a href="{{ url_for('wallchart', project_id=project.id) }}" class="btn btn-secondary mb-5 ms-2">Go to Wallchart</a>
+            <a href="{{ url_for('wallchart', project_id=project.id) }}" class="btn btn-secondary mb-5">Back to Wallchart</a>
+
             <div class="table-responsive">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search by number or name...">
+                    </div>
+                    <div class="col-md-3">
+                        <select id="typeFilter" class="form-select">
+                            <option value="">All Types</option>
+                            <option value="Pipe">Pipe</option>
+                            <option value="Exchanger">Exchanger</option>
+                            <option value="Tower">Tower</option>
+                            <option value="Drum">Drum</option>
+                            <option value="Fin Fan">Fin Fan</option>
+
+                        </select>
+                    </div>
+                </div>
+
+
                 <table class="table table-striped table-bordered" style="background-color: transparent;" id="equipment_table">
                     <thead>
                         <tr>
-                            <th class="type-column">Type</th>
-                            <th class="name-column">Name</th>
-                            <th class="number-column">Number</th>
+                            <th class="type-column sortable">Type</th>
+                            <th class="name-column sortable">Name</th>
+                            <th class="number-column sortable">Number</th>
                             <th class="scope-column">Scope</th>
                             <th class="view-column">View</th>
                         </tr>
@@ -21,19 +40,120 @@
                     <tbody>
                         {% for equipment in equipment_data %}
                         <tr>
-                            <td class="type-column">{{equipment.type}}</td>
+                            <td class="type-column">{{ equipment.type }}</td>
                             <td class="name-column">{{ equipment.name }}</td>
                             <td class="number-column">{{ equipment.number }}</td>
-                            <td class="scope-column"><textarea class="form-control" style="border:none; background-color: {{ loop.cycle('#f0f0f0', '#ffffff' ) }}" readonly>{{ equipment.scope }}</textarea></td>
+                            <td class="scope-column">
+                                <textarea class="form-control" style="border:none; background-color: {{ loop.cycle('#f0f0f0', '#ffffff') }}" readonly>{{ equipment.scope }}</textarea>
+                            </td>
                             <td class="view-column text-center">
-                                <a href="/edit_equipment/{{project.id}}/{{equipment.id}}" class="btn btn-secondary">Edit</a>
+                                <a href="/edit_equipment/{{ project.id }}/{{ equipment.id }}" class="btn btn-secondary">Edit</a>
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                <div id="pagination" class="mt-3 text-center btn-secondary"></div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("searchInput");
+    const typeFilter = document.getElementById("typeFilter");
+    const table = document.getElementById("equipment_table");
+    const tbody = table.querySelector("tbody");
+    const allRows = Array.from(tbody.querySelectorAll("tr"));
+
+    let currentPage = 1;
+    const rowsPerPage = 10;
+    let sortDirection = {};
+    let currentSortCol = 2; // default sort by Number column
+
+    // Natural sort comparison
+    function naturalSort(a, b) {
+        const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+        return collator.compare(a, b);
+    }
+
+    function compareCells(a, b, colIndex) {
+        const textA = a.cells[colIndex].textContent.trim();
+        const textB = b.cells[colIndex].textContent.trim();
+        return naturalSort(textA, textB);
+    }
+
+    function sortTable(colIndex) {
+        currentSortCol = colIndex;
+        const direction = sortDirection[colIndex] = !sortDirection[colIndex];
+        visibleRows.sort((a, b) => {
+            const result = compareCells(a, b, colIndex);
+            return direction ? result : -result;
+        });
+        updateTable();
+    }
+
+    const visibleRows = [...allRows];
+
+    function filterTable() {
+        const search = searchInput.value.toLowerCase();
+        const type = typeFilter.value.toLowerCase();
+        currentPage = 1;
+
+        visibleRows.length = 0;
+        allRows.forEach(row => {
+            const number = row.querySelector(".number-column").textContent.toLowerCase();
+            const name = row.querySelector(".name-column").textContent.toLowerCase();
+            const typeText = row.querySelector(".type-column").textContent.toLowerCase();
+
+            const matchesSearch = number.includes(search) || name.includes(search);
+            const matchesType = !type || typeText === type;
+
+            if (matchesSearch && matchesType) {
+                visibleRows.push(row);
+            }
+        });
+
+        sortTable(currentSortCol);
+    }
+
+    function updateTable() {
+        tbody.innerHTML = "";
+        const totalPages = Math.ceil(visibleRows.length / rowsPerPage);
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        visibleRows.slice(start, end).forEach(row => tbody.appendChild(row));
+        renderPagination(totalPages);
+    }
+
+    function renderPagination(totalPages) {
+        const paginationDiv = document.getElementById("pagination");
+        paginationDiv.innerHTML = "";
+
+        for (let i = 1; i <= totalPages; i++) {
+            const btn = document.createElement("button");
+            btn.className = "btn btn-sm mx-1 " + (i === currentPage ? "btn-secondary" : "btn-light");
+            btn.textContent = i;
+            btn.addEventListener("click", () => {
+                currentPage = i;
+                updateTable();
+            });
+            paginationDiv.appendChild(btn);
+        }
+    }
+
+    document.querySelectorAll(".sortable").forEach((header, index) => {
+        header.style.cursor = "pointer";
+        header.addEventListener("click", () => sortTable(index));
+    });
+
+    searchInput.addEventListener("keyup", filterTable);
+    typeFilter.addEventListener("change", filterTable);
+
+    // Initial setup
+    allRows.forEach(row => row.dataset.visible = "true");
+    filterTable(); // also sorts initially by "Number"
+});
+</script>
 {% endblock %}
