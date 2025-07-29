@@ -166,4 +166,3 @@ def remove_equipment(project_id, equipment_id):
     
 
 
-
