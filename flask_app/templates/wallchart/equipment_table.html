@@ -1,79 +1,90 @@
 
 <div class="table-responsive">
+
     {% for equipment in equipment_data %}
-    <table class="table table-striped rounded-2 mb-0 table-bordered" id="equipment_table">
-        <p class="bg-white mt-2 mb-0 fw-bold p-2 sticky-col">
-            Scope: <br> {{equipment.scope}}
-        </p>
-        <thead>
-            <tr>
-                <th class="sticky-col">Equipment</th>
-                {% for component_name in all_component_names %}
-                    {% if component_name in components_by_equipment[equipment.id] %}
-                        <th>{{ component_name }}</th>
-                    {% endif %}
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td class="sticky-col"><span class="fw-bold"><a href="/edit_equipment/{{project.id}}/{{equipment.id}}" style="color: black;">{{equipment.number}}</a></span><br> {{ equipment.name }}</td>
-                
-                {% for component_name in all_component_names %}
-                    {% if component_name in components_by_equipment[equipment.id] %}
-                        {% set component = components_by_equipment[equipment.id][component_name] %}
-                        <td>
-                            <div id="component-{{ component.id }}" class="component-methods">
-                                {% for method in component.methods %}
-                                    <span class="badge 
-                                        {% if method.status in ['Complete', 'Rejected', 'Deferred'] %}
-                                            badge-success
-                                        {% elif method.status == 'Repair Required' %}
-                                            badge-danger
-                                        {% elif method.status == 'In Progress' %}
-                                            badge-warning
-                                        {% else %}
-                                            badge-secondary
-                                        {% endif %}
-                                        text-black d-flex">
-                                        {% if session.user_role == 'read_only' %}
-                                            {{ method.method_type }}{% if method.updated_by %} - {{ method.updated_by }}{% endif %}
-                                            {% if method.updated_at != method.created_at %}
-                                                {{ method.updated_at.strftime('%m/%d/%y') }}
+    <div class="mb-4 equipment-entry" data-name="{{ equipment.name }}" data-number="{{ equipment.number }}"">
+        <table class="table table-striped rounded-2 mb-0 table-bordered" id="equipment_table">
+            <p class="bg-white mt-2 mb-0 fw-bold p-2 sticky-col">
+                Scope: <br> {{ equipment.scope }}
+            </p>
+            <thead>
+                <tr >
+                    <th class="sticky-col">Equipment</th>
+                    {% for component_name in all_component_names %}
+                        {% if component_name in components_by_equipment[equipment.id] %}
+                            <th>{{ component_name }}</th>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="equipment-entry" data-name="{{ equipment.name }}" data-number="{{ equipment.number }}">
+                    <td class="sticky-col">
+                        <span class="fw-bold">
+                            <a href="/edit_equipment/{{ project.id }}/{{ equipment.id }}" style="color: black;">
+                                {{ equipment.number }}
+                            </a>
+                        </span><br> {{ equipment.name }}
+                    </td>
+
+                    {% for component_name in all_component_names %}
+                        {% if component_name in components_by_equipment[equipment.id] %}
+                            {% set component = components_by_equipment[equipment.id][component_name] %}
+                            <td>
+                                <div id="component-{{ component.id }}" class="component-methods">
+                                    {% for method in component.methods %}
+                                        <span class="badge 
+                                            {% if method.status in ['Complete', 'Rejected', 'Deferred'] %}
+                                                badge-success
+                                            {% elif method.status == 'Repair Required' %}
+                                                badge-danger
+                                            {% elif method.status == 'In Progress' %}
+                                                badge-warning
+                                            {% else %}
+                                                badge-secondary
                                             {% endif %}
-                                        {% else %}
-                                            <a href="#" class="text-black d-flex" data-bs-toggle="modal" data-bs-target="#methodModal" data-method-id="{{ method.id }}" data-component-id="{{ component.id }}" data-method-status="{{ method.status }}" data-equipment-id="{{ equipment.id }}">
+                                            text-black d-flex">
+                                            {% if session.user_role == 'read_only' %}
                                                 {{ method.method_type }}{% if method.updated_by %} - {{ method.updated_by }}{% endif %}
                                                 {% if method.updated_at != method.created_at %}
                                                     {{ method.updated_at.strftime('%m/%d/%y') }}
                                                 {% endif %}
-                                            </a>
-                                        {% endif %}
-                                    </span>
-                                    {% if method.repairs %}
-                                        <div class="repair-details">
-                                            {% set displayed_repairs = [] %}
-                                            {% for repair in method.repairs %}
-                                                {% if repair.repair_number not in displayed_repairs %}
-                                                    {% if repair.file_path %}
-                                                        <a href="{{ url_for('uploaded_file', filename=repair.file_path|basename) }}" class="badge text-black {% if repair.repair_status in ['Complete', 'Rejected', 'Deferred'] %}badge-success{% else %}badge-danger{% endif %}" data-bs-toggle="modal" data-bs-target="#repairModal" data-repair-id="{{ repair.id }}" data-component-id="{{ component.id }}" data-equipment-id="{{ equipment.id }}">{{ repair.repair_number }}</a>
-                                                    {% else %}
-                                                        <span class="badge text-black {% if repair.repair_status in ['Complete', 'Rejected', 'Deferred'] %}badge-success{% else %}badge-danger{% endif %}">{{ repair.repair_number }}</span>
+                                            {% else %}
+                                                <a href="#" class="text-black d-flex" data-bs-toggle="modal" data-bs-target="#methodModal" data-method-id="{{ method.id }}" data-component-id="{{ component.id }}" data-method-status="{{ method.status }}" data-equipment-id="{{ equipment.id }}">
+                                                    {{ method.method_type }}{% if method.updated_by %} - {{ method.updated_by }}{% endif %}
+                                                    {% if method.updated_at != method.created_at %}
+                                                        {{ method.updated_at.strftime('%m/%d/%y') }}
                                                     {% endif %}
-                                                    {% set displayed_repairs = displayed_repairs + [repair.repair_number] %}
-                                                {% endif %}
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                        </td>
-                    {% endif %}
-                {% endfor %}
-            </tr>
-        </tbody>
-    </table>
-{% endfor %}
+                                                </a>
+                                            {% endif %}
+                                        </span>
+                                        {% if method.repairs %}
+                                            <div class="repair-details">
+                                                {% set displayed_repairs = [] %}
+                                                {% for repair in method.repairs %}
+                                                    {% if repair.repair_number not in displayed_repairs %}
+                                                        {% if repair.file_path %}
+                                                            <a href="{{ url_for('uploaded_file', filename=repair.file_path|basename) }}" class="badge text-black {% if repair.repair_status in ['Complete', 'Rejected', 'Deferred'] %}badge-success{% else %}badge-danger{% endif %}" data-bs-toggle="modal" data-bs-target="#repairModal" data-repair-id="{{ repair.id }}" data-component-id="{{ component.id }}" data-equipment-id="{{ equipment.id }}">{{ repair.repair_number }}</a>
+                                                        {% else %}
+                                                            <span class="badge text-black {% if repair.repair_status in ['Complete', 'Rejected', 'Deferred'] %}badge-success{% else %}badge-danger{% endif %}">{{ repair.repair_number }}</span>
+                                                        {% endif %}
+                                                        {% set displayed_repairs = displayed_repairs + [repair.repair_number] %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endfor %}
+</div>
+
 
 
 <!-- Method Modal -->
