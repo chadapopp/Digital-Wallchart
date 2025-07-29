@@ -1,8 +1,9 @@
 from flask_app.config.mysqlconnection import connectToMySQL
 import pandas as pd 
+import re
 
 class Equipment:
-    DB = "digitalwallchart"
+    DB = "digital_wallchart_schema"
     def __init__(self, equip_data):
         self.id = equip_data["id"]
         self.project_id = equip_data["project_id"]
@@ -39,10 +40,27 @@ class Equipment:
     @classmethod
     def get_equipment_by_project(cls, project_id):
         query = "SELECT * FROM equipment WHERE project_id = %s"
-        data = (project_id)
+        data = (project_id,)
         results = connectToMySQL(cls.DB).query_db(query, data)
-        equipment_list = [Equipment(equipment_data) for equipment_data in results]  # Convert dictionary objects to Equipment instances
+
+        equipment_list = [Equipment(equipment_data) for equipment_data in results]
+
+        # ✅ Clean and correct sort for equipment like '55V9', '55V10', '55E1', etc.
+        def sort_key(e):
+            match = re.match(r'([A-Za-z]*)(\d+)', re.sub(r'\D*(\d+)', r'\1', e.number))
+            if match:
+                prefix = ''.join(re.findall(r'^\D+', e.number))  # non-digits at the start
+                number = int(''.join(re.findall(r'\d+', e.number)))  # all digits
+                return (prefix, number)
+            else:
+                return (e.number, 0)
+
+        equipment_list.sort(key=sort_key)
         return equipment_list
+
+
+
+
 
     @classmethod
     def get_equipment_by_id(cls, equipment_id):
