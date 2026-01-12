@@ -24,7 +24,14 @@
                 <td>{{ user.role }}</td>
                 <td class="d-flex w-100">
                     <a href="/edit_user/{{ user.id }}" class="btn btn-secondary">Edit User</a>
-                    <a href="/delete_user/{{user.id}}" class="btn btn-danger ms-1" onclick="return confirm('Are you sure you want to delete {{ user.first_name }} {{ user.last_name }}. This action cannot be undone. User would have to be added again if needed.')">Delete User</a>
+                    <form action="/delete_user/{{ user.id }}" method="POST" class="d-inline ms-1">
+                        <button type="submit"
+                                class="btn btn-danger"
+                                onclick="return confirm('Are you sure you want to delete {{ user.first_name }} {{ user.last_name }}? This action cannot be undone.')">
+                            Delete User
+                        </button>
+</form>
+
                 </td>
             </tr>
             {% endfor %}
