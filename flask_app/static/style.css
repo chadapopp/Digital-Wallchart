@@ -284,11 +284,14 @@ form {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Optional: Add a shadow for better visibility */
 }
 
-.logo {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 50%;
+.logo-container {
+    text-align: center;
+}
+
+.site-logo {
+    width: 200px !important;
+    height: auto !important;
+    display: inline-block;
 }
 
 .watermark {
