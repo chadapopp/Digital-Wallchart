@@ -25,7 +25,7 @@ def add_components(project_id, equipment_id):
 
         return redirect(url_for('add_methods', project_id=project_id, equipment_id=equipment_id))
 
-    components_list = ["External", "Shell", "Nozzles", "Shell Cover", "Bonnet","Inlet Channel", "Outlet Channel", "Channel", "Inlet Channel Cover", "Outlet Channel Cover", "Channel Cover", "Bundle", "Floating Head/Split Rings", "Header Boxes", "Tube Sheets", "Tubesheets", "Tubes", "Heads", "Primary Cyclones", "Secondary Cyclones", "Airgrid", "Internal Components", "Refractory", "Radiant Mechanical", "Radiant Refractory", "Convection Mechanical", "Convection Refractory", "Stack", "Closure", "Hydro", "Report"]
+    components_list = ["Internal","External", "Shell", "Nozzles", "Shell Cover", "Bonnet","Inlet Channel", "Outlet Channel", "Channel", "Inlet Channel Cover", "Outlet Channel Cover", "Channel Cover", "Bundle", "Floating Head/Split Rings", "Header Boxes", "Tube Sheets", "Tubesheets", "Tubes", "Heads", "Primary Cyclones", "Secondary Cyclones", "Airgrid", "Internal Components", "Refractory", "Radiant Mechanical", "Radiant Refractory", "Convection Mechanical", "Convection Refractory", "Stack", "Closure", "Hydro", "Report"]
     equipment_info = Equipment.get_equipment_by_id(equipment_id)[0]  
     return render_template('components/add_components.html', project_id=project_id, equipment_id=equipment_id, components_list=components_list, equipment_info = equipment_info)
 
